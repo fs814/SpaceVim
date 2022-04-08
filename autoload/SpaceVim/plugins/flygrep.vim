@@ -12,6 +12,7 @@ let s:MPT = SpaceVim#api#import('prompt')
 let s:JOB = SpaceVim#api#import('job')
 let s:SYS = SpaceVim#api#import('system')
 let s:BUFFER = SpaceVim#api#import('vim#buffer')
+let s:FILE = SpaceVim#api#import('file')
 let s:LIST = SpaceVim#api#import('data#list')
 let s:REGEX = SpaceVim#api#import('vim#regex')
 let s:VIM = SpaceVim#api#import('vim')
@@ -138,7 +139,8 @@ function! s:get_search_cmd(expr) abort
     let cmd += [a:expr] 
     " when using rg, ag, need to add '.' at the end.
     if s:grep_exe ==# 'rg' || s:grep_exe ==# 'ag' || s:grep_exe ==# 'pt'
-      let cmd += ['.']
+      "let cmd += ['.']
+      let cmd += [s:grep_dir]
     endif
     let cmd += s:grep_ropt
   endif
@@ -895,7 +897,8 @@ function! SpaceVim#plugins#flygrep#open(argv) abort
   if !empty(dir) && isdirectory(dir)
     let s:grep_dir = dir
   else
-    let s:grep_dir = ''
+    "let s:grep_dir = ''
+    let s:grep_dir = s:FILE.unify_path(SpaceVim#plugins#projectmanager#current_root())
   endif
   let s:grep_exe = get(a:argv, 'cmd', s:grep_default_exe)
   if empty(s:grep_dir) && empty(s:grep_files) && s:grep_exe ==# 'findstr'

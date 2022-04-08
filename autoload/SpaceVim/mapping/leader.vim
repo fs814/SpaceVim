@@ -183,6 +183,9 @@ endfunction
 
 
 function! SpaceVim#mapping#leader#getName(key) abort
+  if char2nr(a:key) == 9
+     return '\[<tab>\]'
+  endif
   if a:key ==# ' '
     return '[SPC]'
   elseif a:key ==# 'g'

@@ -1381,6 +1381,8 @@ function! SpaceVim#end() abort
   call SpaceVim#mapping#z#init()
   call SpaceVim#mapping#leader#defindKEYs()
   call SpaceVim#mapping#space#init()
+  call SpaceVim#mapping#comma#init()
+  call SpaceVim#mapping#tabkey#init()
   if !SpaceVim#mapping#guide#has_configuration()
     let g:leaderGuide_map = {}
     call SpaceVim#mapping#guide#register_prefix_descriptions('', 'g:leaderGuide_map')
