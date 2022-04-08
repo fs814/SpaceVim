@@ -1,7 +1,7 @@
 "=============================================================================
 " python.vim --- SpaceVim lang#python layer
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -98,6 +98,7 @@ function! SpaceVim#layers#lang#python#plugins() abort
   let plugins = []
   " python
   if !SpaceVim#layers#lsp#check_filetype('python')
+        \ && !SpaceVim#layers#lsp#check_server('pyright')
     if has('nvim')
       call add(plugins, ['zchee/deoplete-jedi', { 'on_ft' : 'python'}])
       " in neovim, we can use deoplete-jedi together with jedi-vim,
@@ -115,6 +116,8 @@ function! SpaceVim#layers#lang#python#plugins() abort
         \ { 'on_ft' : 'python'}])
   call add(plugins, ['alfredodeza/coveragepy.vim', 
         \ { 'merged' : 0}])
+  call add(plugins, [g:_spacevim_root_dir . 'bundle/vim-virtualenv', 
+        \ { 'merged' : 0}])
   return plugins
 endfunction
 
@@ -131,11 +134,13 @@ function! SpaceVim#layers#lang#python#config() abort
   " mapping in your vimrc, such as if you do:
   let g:pydocstring_enable_mapping = 0
 
-  if g:spacevim_autocomplete_parens
-    augroup python_delimit
+  augroup spacevim_layer_lang_python
+    autocmd!
+    autocmd FileType python call SpaceVim#util#check_if_expand_tab()
+    if g:spacevim_autocomplete_parens
       au FileType python let b:delimitMate_nesting_quotes = ['"', "'"]
-    augroup end
-  endif
+    endif
+  augroup END
   " }}}
   let g:deoplete#sources#jedi#enable_typeinfo = s:enable_typeinfo
   call SpaceVim#plugins#runner#reg_runner('python', 
@@ -245,6 +250,13 @@ function! s:language_specified_mappings() abort
           \ 'enable' : 1,
           \ })
   endif
+
+  let g:_spacevim_mappings_space.l.v = {'name' : '+Virtualenv'}
+
+  call SpaceVim#mapping#space#langSPC('nnoremap', ['l', 'v', 'l'],
+        \ 'VirtualEnvList', 'list-all-virtualenvs', 1)
+  call SpaceVim#mapping#space#langSPC('nnoremap', ['l', 'v', 'd'],
+        \ 'VirtualEnvDeactivate', 'deactivate-current-virtualenv', 1)
 
 endfunction
 

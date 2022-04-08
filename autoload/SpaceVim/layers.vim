@@ -1,7 +1,7 @@
 "=============================================================================
 " layers.vim --- layers public API
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -65,6 +65,8 @@ let s:SYS = SpaceVim#api#import('system')
 function! SpaceVim#layers#load(layer, ...) abort
   if a:layer ==# '-l'
     call s:list_layers()
+    return
+  elseif empty(a:layer) || type(a:layer) !=# type('')
     return
   endif
   let loadable = 1

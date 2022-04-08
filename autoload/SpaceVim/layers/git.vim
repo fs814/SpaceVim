@@ -1,7 +1,7 @@
 "=============================================================================
 " git.vim --- SpaceVim git layer
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -21,6 +21,13 @@
 "   [[layers]]
 "     name = 'git'
 "     git_plugin = 'git'
+" <
+" `git_diff_position`: set the default command to split diff windows, by
+" default it is `10split`. Example:
+" >
+"   [[layers]]
+"     name = 'git'
+"     git_diff_position = 'vsplit'
 " <
 " @subsection Key bindings
 "
@@ -70,7 +77,7 @@ endfunction
 
 function! SpaceVim#layers#git#config() abort
   let g:signify_vcs_list = ['hg']
-  let g:_spacevim_mappings_space.g = get(g:_spacevim_mappings_space, 'g',  {'name' : '+VersionControl/git'})
+  let g:_spacevim_mappings_space.g = get(g:_spacevim_mappings_space, 'g',  {'name' : '+VCS/git'})
   if s:git_plugin ==# 'gina'
     call SpaceVim#mapping#space#def('nnoremap', ['g', 's'], 'Gina status --opener=10split', 'git-status', 1)
     call SpaceVim#mapping#space#def('nnoremap', ['g', 'S'], 'Gina add %', 'stage-current-file', 1)
@@ -88,11 +95,11 @@ function! SpaceVim#layers#git#config() abort
     call SpaceVim#mapping#space#def('nnoremap', ['g', 'U'], 'Git reset -q %', 'unstage-current-file', 1)
     call SpaceVim#mapping#space#def('nnoremap', ['g', 'c'], 'Git commit', 'edit-git-commit', 1)
     call SpaceVim#mapping#space#def('nnoremap', ['g', 'p'], 'Git push', 'git-push', 1)
-    call SpaceVim#mapping#space#def('nnoremap', ['g', 'd'], 'Gdiff', 'view-git-diff', 1)
+    call SpaceVim#mapping#space#def('nnoremap', ['g', 'd'], 'Gdiffsplit', 'view-git-diff', 1)
     call SpaceVim#mapping#space#def('nnoremap', ['g', 'A'], 'Git add .', 'stage-all-files', 1)
     call SpaceVim#mapping#space#def('nnoremap', ['g', 'b'], 'Git blame', 'view-git-blame', 1)
-    call SpaceVim#mapping#space#def('nnoremap', ['g', 'V'], 'Glog -- %', 'git-log-of-current-file', 1)
-    call SpaceVim#mapping#space#def('nnoremap', ['g', 'v'], 'Glog --', 'git-log-of-current-repo', 1)
+    call SpaceVim#mapping#space#def('nnoremap', ['g', 'V'], 'Gclog -- %', 'git-log-of-current-file', 1)
+    call SpaceVim#mapping#space#def('nnoremap', ['g', 'v'], 'Gclog --', 'git-log-of-current-repo', 1)
   elseif s:git_plugin ==# 'gita'
     let g:gita#suppress_warning = 1
     call SpaceVim#mapping#space#def('nnoremap', ['g', 's'], 'Gita status', 'git-status', 1)
@@ -152,6 +159,7 @@ function! SpaceVim#layers#git#set_variable(var) abort
         \ get(a:var,
         \ 'git-plugin',
         \ s:git_plugin))
+  let g:git_diff_position = get(a:var, 'git_diff_position', '10split')
 
 endfunction
 

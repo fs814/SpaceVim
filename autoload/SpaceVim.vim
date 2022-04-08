@@ -1,7 +1,7 @@
 "=============================================================================
 " SpaceVim.vim --- Initialization and core files for SpaceVim
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Shidong Wang < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Shidong Wang < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -11,7 +11,7 @@ scriptencoding utf-8
 " @section Introduction, intro
 " @stylized spacevim
 " @library
-" @order intro options config functions layers usage api dev faq changelog
+" @order intro options config functions layers usage plugins api dev faq changelog
 " SpaceVim is a bundle of custom settings and plugins with a modular
 " configuration for Vim. It was inspired by Spacemacs.
 "
@@ -68,6 +68,11 @@ lockvar g:spacevim_version
 "   let g:spacevim_default_indent = 2
 " <
 let g:spacevim_default_indent          = 2
+""
+" @section expand_tab, options-expand_tab
+" @parentsection options
+" In Insert mode: Use the appropriate number of spaces to insert a <Tab>
+
 ""
 " In Insert mode: Use the appropriate number of spaces to insert a <Tab>
 let g:spacevim_expand_tab              = 1
@@ -592,6 +597,24 @@ let g:spacevim_statusline_left_sections = ['winnr', 'filename', 'major mode',
       \ 'search count',
       \ 'syntax checking', 'minor mode lighters',
       \ ]
+""
+" @section statusline_right_sections, options-statusline_right_sections
+" @parentsection options
+" Define the right section of statusline in active windows. By default:
+" >
+"   statusline_right_sections = [
+"     'fileformat',
+"     'cursorpos',
+"     'percentage'
+"     ]
+" <
+"
+" The following sections can be used in this option:
+" - fileformat: the format of current file
+" - cursorpos: the corsur position
+" - percentage: the percent of current page
+" - totallines: the total lines of current buffer
+
 ""
 " Define the right section of statusline in active windows. By default:
 " >
@@ -1165,10 +1188,23 @@ let g:spacevim_project_auto_root = 1
 "   let g:spacevim_project_rooter_outermost = 0
 " <
 let g:spacevim_project_rooter_outermost = 1
+""
+" @section commandline_prompt, options-commandline_prompt
+" @parentsection options
+" Config the command line prompt for flygrep and denite etc.
+" Default is `>`, for example:
+" >
+"   commandline_prompt = '➭'
+" <
 
 ""
 " Config the command line prompt for flygrep and denite etc.
-let g:spacevim_commandline_prompt = '➭'
+let g:spacevim_commandline_prompt = '>'
+
+""
+" @section todo_labels, options-todo_labels
+" @parentsection options
+" Option for setting todo labels in current project.
 
 ""
 " Option for setting todo labels in current project.
@@ -1256,10 +1292,16 @@ let g:spacevim_src_root                = 'E:\sources\'
 " Google and Twitter.
 let g:spacevim_hosts_url
       \ = 'https://raw.githubusercontent.com/racaljk/hosts/master/hosts'
+""
+" @section wildignore, options-wildignore
+" @parentsection options
+" A list of file patterns when file match it will be ignored.
+" >
+"   wildignore =  '*/tmp/*,*.so,*.swp,*.zip,*.class,tags,*.jpg,*.ttf,*.TTF,*.png,*/target/*,.git,.svn,.hg,.DS_Store,*.svg'
+" <
+
 let g:spacevim_wildignore
-      \ = '*/tmp/*,*.so,*.swp,*.zip,*.class,tags,*.jpg,
-      \*.ttf,*.TTF,*.png,*/target/*,
-      \.git,.svn,.hg,.DS_Store,*.svg'
+      \ = '*/tmp/*,*.so,*.swp,*.zip,*.class,tags,*.jpg,*.ttf,*.TTF,*.png,*/target/*,.git,.svn,.hg,.DS_Store,*.svg'
 
 " }}}
 
@@ -1496,6 +1538,7 @@ function! SpaceVim#end() abort
       " enable blinking mode-sensitive cursor
       set guicursor=n-v-c:block-blinkon10,i-ci-ve:ver25-blinkon10,r-cr:hor20,o:hor50
     endif
+    set guicursor+=a:Cursor/lCursor
   endif
   filetype plugin indent on
   syntax on
@@ -1648,6 +1691,40 @@ endfunction
 " @section Usage, usage
 "   General guide for using SpaceVim. Including layer configuration, bootstrap
 "   function.
+
+""
+" @section undo-tree, usage-undotree
+" @parentsection usage
+" Undo tree visualizes the undo history and makes it easier to browse and
+" switch between different undo branches.The default key binding is `F7`.
+" If `+python` or `+python3` is enabled, `vim-mundo` will be used,
+" otherwise `undotree` will be used.
+" 
+" Key bindings within undo tree windows:
+" >
+"    key bindings     description
+"    `G`              move bottom
+"    `J`              move older write
+"    `K`              move newer write
+"    `N`              previous match
+"    `P`              play to
+"    `<2-LeftMouse>`  mouse click
+"    `/`              search
+"    `<CR>`           preview
+"    `d`              diff
+"    `<down>`         move older
+"    `<up>`           move newer
+"    `i`              toggle inline
+"    `j`              move older
+"    `k`              move newer
+"    `n`              next match
+"    `o`              preview
+"    `p`              diff current buffer
+"    `q`              quit
+"    `r`              diff
+"    `gg`             move top
+"    `?`              toggle help
+" <
 
 ""
 " @section windows-and-tabs, usage-windows-and-tabs

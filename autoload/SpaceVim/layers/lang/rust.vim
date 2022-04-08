@@ -1,7 +1,7 @@
 "=============================================================================
 " rust.vim --- SpaceVim lang#rust layer
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -70,6 +70,7 @@
 "   SPC l c B   cargo-bench
 "   SPC l c D   cargo-docs
 "   SPC l c r   cargo-run
+"   SPC l c l   cargo-clippy
 " <
 "
 " This layer also provides REPL support for rust, the key bindings are:
@@ -182,6 +183,9 @@ function! s:language_specified_mappings() abort
   call SpaceVim#mapping#space#langSPC('nnoremap', ['l','c', 't'], 'call call('
         \ . string(function('s:execCMD')) . ', ["cargo test"])',
         \ 'cargo-test', 1)
+  call SpaceVim#mapping#space#langSPC('nnoremap', ['l','c', 'l'], 'call call('
+        \ . string(function('s:execCMD')) . ', ["cargo clippy"])',
+        \ 'cargo-clippy', 1)
   call SpaceVim#mapping#space#langSPC('nnoremap', ['l','c', 'u'], 'call call('
         \ . string(function('s:execCMD')) . ', ["cargo update"])',
         \ 'update-external-dependencies', 1)

@@ -1,6 +1,6 @@
 "=============================================================================
 " notify.vim --- notify api
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
 " Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
@@ -61,9 +61,15 @@ endfunction
 
 function! s:self.win_is_open() abort
   try
-    return self.winid >= 0 && self.border.winid >= 0
-          \ && has_key(nvim_win_get_config(self.winid), 'col')
-          \ && has_key(nvim_win_get_config(self.border.winid), 'col')
+    if exists('*nvim_win_get_config')
+      return self.winid >= 0 && self.border.winid >= 0
+            \ && has_key(nvim_win_get_config(self.winid), 'col')
+            \ && has_key(nvim_win_get_config(self.border.winid), 'col')
+    elseif exists('*popup_getoptions')
+      return self.winid >= 0 && self.border.winid >= 0
+            \ && has_key(popup_getoptions(self.winid), 'col')
+            \ && has_key(popup_getoptions(self.border.winid), 'col')
+    endif
   catch
     return 0
   endtry
@@ -108,8 +114,10 @@ function! s:self.close(...) abort
     call remove(self.message, 0)
   endif
   if len(self.message) == 0
-    noautocmd call self.__floating.win_close(self.border.winid, v:true)
-    noautocmd call self.__floating.win_close(self.winid, v:true)
+    if self.win_is_open()
+      noautocmd call self.__floating.win_close(self.border.winid, v:true)
+      noautocmd call self.__floating.win_close(self.winid, v:true)
+    endif
     call remove(s:notifications, self.hashkey)
     let self.notification_width = 1
   endif
@@ -178,7 +186,7 @@ function! s:self.redraw_windows() abort
     if !bufexists(self.bufnr)
       let self.bufnr = self.__buffer.create_buf(0, 1)
     endif
-    let self.winid =  self.__floating.open_win(self.bufnr, v:false,
+    noautocmd let self.winid =  self.__floating.open_win(self.bufnr, v:false,
           \ {
             \ 'relative': 'editor',
             \ 'width'   : self.notification_width, 
@@ -188,7 +196,7 @@ function! s:self.redraw_windows() abort
             \ 'col': &columns - self.notification_width - 1,
             \ 'focusable' : v:false,
             \ })
-    let self.border.winid =  self.__floating.open_win(self.border.bufnr, v:false,
+    noautocmd let self.border.winid =  self.__floating.open_win(self.border.bufnr, v:false,
           \ {
             \ 'relative': 'editor',
             \ 'width'   : self.notification_width + 2, 

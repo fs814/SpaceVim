@@ -1,7 +1,7 @@
 "=============================================================================
 " ui.vim --- SpaceVim ui layer
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -25,7 +25,7 @@ scriptencoding utf-8
 "     concealcursor = ''
 "     cursorword_delay = 50
 "     cursorword_exclude_filetype = []
-"     indentline_exclude_filetyps = []
+"     indentline_exclude_filetype = []
 " <
 "
 " if you want to disable `ui` layer, you can use:
@@ -50,7 +50,7 @@ scriptencoding utf-8
 " word highlight after cursor motions, the default is 50.
 " 9. `cursorword_exclude_filetypes`: Ignore filetypes when enable cursorword
 " highlighting.
-" 10. `indentline_exclude_filetyps`: Ignore filetypes when enable indentline.
+" 10. `indentline_exclude_filetype`: Ignore filetypes when enable indentline.
 "
 " @subsection key bindings
 " >
@@ -67,7 +67,7 @@ else
   let s:enable_scrollbar = 0
   let s:enable_indentline = 1
   let s:indentline_char = '|'
-  let s:indentline_exclude_filetyps = []
+  let s:indentline_exclude_filetype = []
   let s:enable_cursorword = 0
   let s:conceallevel = 0
   let s:concealcursor = ''
@@ -96,7 +96,7 @@ function! SpaceVim#layers#ui#plugins() abort
           \ 'DisableWhitespace',
           \ 'EnableWhitespace'
           \ ]}],
-        \ ]
+          \ ]
   if (has('nvim-0.5.0') && s:NVIM_VERSION.is_release_version())
         \ || has('nvim-0.6.0')
     call add(plugins, [g:_spacevim_root_dir . 'bundle/indent-blankline.nvim',
@@ -139,11 +139,18 @@ function! SpaceVim#layers#ui#config() abort
 
   " enable/disable indentline
   let g:indentLine_enabled = s:enable_indentline
-  let g:indent_blankline_enabled = s:enable_indentline
+  " this var must be boolean, but v:true is added in vim 7.4.1154
+  let g:indent_blankline_enabled = 
+        \ s:enable_indentline ?
+        \ get(v:, 'true', 1)
+        \ :
+        \ get(v:, 'false', 0)
 
   " exclude filetypes for indentline
-  let g:indentLine_fileTypeExclude = s:indentline_exclude_filetyps
-  let g:indent_blankline_buftype_exclude = s:indentline_exclude_filetyps
+  let g:indentLine_fileTypeExclude = s:indentline_exclude_filetype
+
+  let g:indent_blankline_filetype_exclude = s:indentline_exclude_filetype
+        \ + ['startify', 'gitcommit', 'defx']
 
   let g:better_whitespace_filetypes_blacklist = ['diff', 'gitcommit', 'unite',
         \ 'qf', 'help', 'markdown', 'leaderGuide',
@@ -228,8 +235,9 @@ function! SpaceVim#layers#ui#config() abort
         \ . string(s:_function('s:toggle_syntax_hi')) . ', [])',
         \ 'toggle-syntax-highlighting', 1)
 
-  call SpaceVim#mapping#space#def('nmap', ['T', 'F'], '<F11>',
-        \ 'fullscreen-frame', 0)
+  call SpaceVim#mapping#space#def('nnoremap', ['T', 'F'], 'call call('
+        \ . string(s:_function('s:toggle_full_screen')) . ', [])',
+        \ 'fullscreen-frame', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['T', 'm'], 'call call('
         \ . string(s:_function('s:toggle_menu_bar')) . ', [])',
         \ 'toggle-menu-bar', 1)
@@ -272,23 +280,23 @@ function! SpaceVim#layers#ui#config() abort
         \ . string(s:_function('s:toggle_whitespace')) . ', [])',
         \ 'toggle-highlight-tail-spaces', 1)
 
-  " download gvimfullscreen.dll from github, copy gvimfullscreen.dll to
-  " the directory that has gvim.exe
-  if has('nvim')
-    nnoremap <silent> <F11> :call <SID>toggle_full_screen()<Cr>
-  else
-    nnoremap <silent> <F11> :call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)<cr>
-  endif
+  nnoremap <silent> <F11> :call <SID>toggle_full_screen()<Cr>
 endfunction
 
 let s:fullscreen_flag = 0
 function! s:toggle_full_screen() abort
-  if s:fullscreen_flag == 0
-    call GuiWindowFullScreen(1)
-    let s:fullscreen_flag = 1
+  if has('nvim')
+    if s:fullscreen_flag == 0
+      call GuiWindowFullScreen(1)
+      let s:fullscreen_flag = 1
+    else
+      call GuiWindowFullScreen(0)
+      let s:fullscreen_flag = 0
+    endif
   else
-    call GuiWindowFullScreen(0)
-    let s:fullscreen_flag = 0
+    " download gvimfullscreen.dll from github, copy gvimfullscreen.dll to
+    " the directory that has gvim.exe
+    call libcallnr("gvimfullscreen.dll", "ToggleFullScreen", 0)
   endif
 endfunction
 
@@ -563,9 +571,9 @@ function! SpaceVim#layers#ui#set_variable(var) abort
   let s:indentline_char = get(a:var,
         \ 'indentline_char',
         \ s:indentline_char)
-  let s:indentline_exclude_filetyps = get(a:var,
-        \ 'indentline_exclude_filetyps',
-        \ s:indentline_exclude_filetyps)
+  let s:indentline_exclude_filetype = get(a:var,
+        \ 'indentline_exclude_filetype',
+        \ s:indentline_exclude_filetype)
   let s:enable_cursorword = get(a:var,
         \ 'enable_cursorword',
         \ s:enable_cursorword)
@@ -608,7 +616,7 @@ function! SpaceVim#layers#ui#get_options() abort
         \ 'cursorword_delay',
         \ 'concealcursor',
         \ 'conceallevel',
-        \ 'indentline_exclude_filetyps',
+        \ 'indentline_exclude_filetype',
         \ 'indentline_char',
         \ 'cursorword_exclude_filetypes']
 

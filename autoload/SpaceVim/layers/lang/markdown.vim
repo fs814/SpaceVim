@@ -1,7 +1,7 @@
 "=============================================================================
 " markdown.vim --- lang#markdown layer for SpaceVim
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Shidong Wang < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Shidong Wang < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -85,7 +85,7 @@ function! SpaceVim#layers#lang#markdown#plugins() abort
   call add(plugins, ['iamcco/markdown-preview.nvim',
         \ { 'on_cmd' : 'MarkdownPreview',
         \ 'depends': 'open-browser.vim',
-        \ 'build' : 'cd app & ' . s:node_pkgm . ' install' }])
+        \ 'build' : 'cd app & ' . s:node_pkgm . ' install --force' }])
   if !has('nvim')
     call add(plugins, ['neoclide/vim-node-rpc',  {'merged': 0, 'build' : s:node_pkgm . ' install'}])
   endif
@@ -149,6 +149,7 @@ function! s:mappings() abort
         \ . string(function('s:run_code_in_block'))
         \ . ', [])', 'run code in block', 1)
   call SpaceVim#mapping#space#langSPC('nmap', ['l','c'], 'GenTocGFM', 'create content at cursor', 1)
+  call SpaceVim#mapping#space#langSPC('nmap', ['l','C'], 'RemoveToc', 'remove content', 1)
   call SpaceVim#mapping#space#langSPC('nmap', ['l','u'], 'UpdateToc', 'update content', 1)
 endfunction
 

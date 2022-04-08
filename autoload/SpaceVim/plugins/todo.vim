@@ -1,10 +1,25 @@
 "=============================================================================
 " todo.vim --- todo manager for SpaceVim
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
+
+""
+" @section todo manager, plugins-todomanager
+" @parentsection plugins
+" The `todomanager` plugin provides todo manager support for SpaceVim.
+" 
+" @subsection Key bindings
+" >
+"   Key binding     Description
+"   SPC a o         open todo manager windows
+" <
+" 
+" @subsection Configuration
+"
+" The todo manager labels can be set via @section(options-todo_labels)
 
 let s:JOB = SpaceVim#api#import('job')
 let s:BUFFER = SpaceVim#api#import('vim#buffer')

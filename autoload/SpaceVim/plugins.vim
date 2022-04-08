@@ -1,12 +1,19 @@
 "=============================================================================
 " plugins.vim --- plugin wrapper
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
 
 scriptencoding utf-8
+
+
+""
+" @section Plugins, plugins
+" This is a list of buildin plugins.
+
+
 function! SpaceVim#plugins#load() abort
   if SpaceVim#plugins#enable_plug()
     call SpaceVim#plugins#begin(g:spacevim_plugin_bundle_dir)

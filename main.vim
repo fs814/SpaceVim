@@ -1,10 +1,20 @@
 "=============================================================================
 " main.vim --- Main file of SpaceVim
 " Copyright (c) 2016-2021 Shidong Wang & Contributors
-" Author: Shidong Wang < wsdjeg at 163.com >
+" Author: Shidong Wang < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
+
+" set default encoding to utf-8
+" Let Vim use utf-8 internally, because many scripts require this
+set encoding=utf-8
+scriptencoding utf-8
+
+" Enable nocompatible
+if &compatible
+  set nocompatible
+endif
 
 let g:_spacevim_root_dir = escape(fnamemodify(resolve(fnamemodify(expand('<sfile>'),
       \ ':p:h:gs?\\?'.((has('win16') || has('win32')
@@ -22,17 +32,7 @@ else
 endif
 call SpaceVim#logger#info('Loading SpaceVim from: ' . g:_spacevim_root_dir)
 
-" Enable nocompatible
 if has('vim_starting')
-  " set default encoding to utf-8
-
-  " Let Vim use utf-8 internally, because many scripts require this
-  set encoding=utf-8
-  scriptencoding utf-8
-  if &compatible
-    " compatible mode is not supported in SpaceVim
-    set nocompatible
-  endif
   " python host
   if !empty($PYTHON_HOST_PROG)
     let g:python_host_prog  = $PYTHON_HOST_PROG

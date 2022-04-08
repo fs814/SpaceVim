@@ -1,7 +1,7 @@
 "=============================================================================
 " autocmd.vim --- main autocmd group for spacevim
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Shidong Wang < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Shidong Wang < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -45,9 +45,8 @@ function! SpaceVim#autocmds#init() abort
     autocmd BufNewFile,BufRead *.avs set syntax=avs " for avs syntax file.
     autocmd FileType c,cpp,java,javascript set comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,://
     autocmd FileType cs set comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,:///,://
-    autocmd FileType vim set comments=sO:\"\ -,mO:\"\ \ ,eO:\"\",:\"
     autocmd Filetype qf setlocal nobuflisted
-    autocmd FileType python,coffee call SpaceVim#util#check_if_expand_tab()
+    autocmd FileType coffee call SpaceVim#util#check_if_expand_tab()
     au StdinReadPost * call s:disable_welcome()
     if !has('nvim-0.5.0')
       autocmd InsertEnter * call s:fixindentline()
@@ -60,7 +59,6 @@ function! SpaceVim#autocmds#init() abort
       autocmd FocusLost * call system('synclient touchpadoff=0')
       autocmd FocusGained * call s:reload_touchpad_status()
     endif
-    " @fixme this autocmd should also support `:w foo/test.vim`
     autocmd BufWritePre * call SpaceVim#plugins#mkdir#CreateCurrent()
     autocmd ColorScheme * call SpaceVim#api#import('vim#highlight').hide_in_normal('EndOfBuffer')
     autocmd ColorScheme gruvbox,jellybeans,nord,srcery,NeoSolarized,one call s:fix_colorschem_in_SpaceVim()
@@ -197,6 +195,12 @@ function! SpaceVim#autocmds#VimEnter() abort
     echohl Error
     echom 'bootstrap_after function failed to execute. Check `SPC h L` for errors.'
     echohl None
+  endif
+
+  if !filereadable('.SpaceVim.d/init.toml') && filereadable('.SpaceVim.d/init.vim')
+    call SpaceVim#logger#info('loading local conf: .SpaceVim.d/init.vim')
+    exe 'source .SpaceVim.d/init.vim'
+    call SpaceVim#logger#info('finished loading local conf')
   endif
 endfunction
 

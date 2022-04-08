@@ -1,7 +1,7 @@
 "=============================================================================
 " custom.vim --- custom API in SpaceVim
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -148,11 +148,12 @@ function! s:apply(config, type) abort
     let layers = get(a:config, 'layers', [])
     for layer in layers
       let enable = get(layer, 'enable', 1)
+      let name = get(layer, 'name', '')
       if (type(enable) == type('') && !eval(enable))
             \ || (type(enable) != type('') && !enable)
-        call SpaceVim#layers#disable(layer.name)
+        call SpaceVim#layers#disable(name)
       else
-        call SpaceVim#layers#load(layer.name, layer)
+        call SpaceVim#layers#load(name, layer)
       endif
     endfor
     let custom_plugins = get(a:config, 'custom_plugins', [])
@@ -221,6 +222,8 @@ function! s:path_to_fname(path) abort
 endfunction
 
 function! SpaceVim#custom#load() abort
+  call SpaceVim#logger#info('start loading global config >>>')
+  call s:load_glob_conf()
   " if file .SpaceVim.d/init.toml exist
   if filereadable('.SpaceVim.d/init.toml')
     let local_dir = s:FILE.unify_path(
@@ -246,10 +249,6 @@ function! SpaceVim#custom#load() abort
       call writefile([s:JSON.json_encode(conf)], local_conf_cache)
       call s:apply(conf, 'local')
     endif
-    if g:spacevim_force_global_config
-      call SpaceVim#logger#info('force loading global config >>>')
-      call s:load_glob_conf()
-    endif
   elseif filereadable('.SpaceVim.d/init.vim')
     let local_dir = s:FILE.unify_path(
           \ s:CMP.resolve(fnamemodify('.SpaceVim.d/', ':p:h')))
@@ -257,15 +256,8 @@ function! SpaceVim#custom#load() abort
     let &rtp = local_dir . ',' . &rtp . ',' . local_dir . 'after'
     let local_conf = g:_spacevim_config_path
     call SpaceVim#logger#info('find local conf: ' . local_conf)
-    exe 'source .SpaceVim.d/init.vim'
-    if g:spacevim_force_global_config
-      call SpaceVim#logger#info('force loading global config >>>')
-      call s:load_glob_conf()
-    endif
   else
-    call SpaceVim#logger#info(
-          \ 'Can not find project local config, start loading global config')
-    call s:load_glob_conf()
+    call SpaceVim#logger#info('Could not find project local config')
   endif
 
 

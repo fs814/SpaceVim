@@ -1,7 +1,7 @@
 "=============================================================================
 " statusline.vim --- SpaceVim statusline
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -62,41 +62,41 @@ let s:i_separators = {
 let s:loaded_modes = []
 let s:modes = {
       \ 'center-cursor': {
-      \ 'icon' : '⊝',
-      \ 'icon_asc' : '-',
-      \ 'desc' : 'centered-cursor mode',
-      \ },
-      \ 'hi-characters-for-long-lines' :{
-      \ 'icon' : '⑧',
-      \ 'icon_asc' : '8',
-      \ 'desc' : 'toggle highlight of characters for long lines',
-      \ },
-      \ 'fill-column-indicator' :{
-      \ 'icon' : s:MESSLETTERS.circled_letter('f'),
-      \ 'icon_asc' : 'f',
-      \ 'desc' : 'fill-column-indicator mode',
-      \ },
-      \ 'syntax-checking' :{
-      \ 'icon' : s:MESSLETTERS.circled_letter('s'),
-      \ 'icon_asc' : 's',
-      \ 'desc' : 'syntax-checking mode',
-      \ },
-      \ 'spell-checking' :{
-      \ 'icon' : s:MESSLETTERS.circled_letter('S'),
-      \ 'icon_asc' : 'S',
-      \ 'desc' : 'spell-checking mode',
-      \ },
-      \ 'paste-mode' :{
-      \ 'icon' : s:MESSLETTERS.circled_letter('p'),
-      \ 'icon_asc' : 'p',
-      \ 'desc' : 'paste mode',
-      \ },
-      \ 'whitespace' :{
-      \ 'icon' : s:MESSLETTERS.circled_letter('w'),
-      \ 'icon_asc' : 'w',
-      \ 'desc' : 'whitespace mode',
-      \ },
-      \ }
+        \ 'icon' : '⊝',
+        \ 'icon_asc' : '-',
+        \ 'desc' : 'centered-cursor mode',
+        \ },
+        \ 'hi-characters-for-long-lines' :{
+        \ 'icon' : '⑧',
+        \ 'icon_asc' : '8',
+        \ 'desc' : 'toggle highlight of characters for long lines',
+        \ },
+        \ 'fill-column-indicator' :{
+        \ 'icon' : s:MESSLETTERS.circled_letter('f'),
+        \ 'icon_asc' : 'f',
+        \ 'desc' : 'fill-column-indicator mode',
+        \ },
+        \ 'syntax-checking' :{
+        \ 'icon' : s:MESSLETTERS.circled_letter('s'),
+        \ 'icon_asc' : 's',
+        \ 'desc' : 'syntax-checking mode',
+        \ },
+        \ 'spell-checking' :{
+        \ 'icon' : s:MESSLETTERS.circled_letter('S'),
+        \ 'icon_asc' : 'S',
+        \ 'desc' : 'spell-checking mode',
+        \ },
+        \ 'paste-mode' :{
+        \ 'icon' : s:MESSLETTERS.circled_letter('p'),
+        \ 'icon_asc' : 'p',
+        \ 'desc' : 'paste mode',
+        \ },
+        \ 'whitespace' :{
+        \ 'icon' : s:MESSLETTERS.circled_letter('w'),
+        \ 'icon_asc' : 'w',
+        \ 'desc' : 'whitespace mode',
+        \ },
+        \ }
 
 if SpaceVim#layers#isLoaded('checkers')
   call add(s:loaded_modes, 'syntax-checking')
@@ -171,6 +171,9 @@ function! s:modes() abort
   return m . ' '
 endfunction
 
+function! s:totallines() abort
+  return ' %L '
+endfunction
 
 function! s:percentage() abort
   return ' %P '
@@ -233,8 +236,8 @@ function! s:input_method() abort
 endfunction
 
 
-if g:spacevim_lint_engine ==# 'neomake'
-  function! s:syntax_checking() abort
+function! s:syntax_checking() abort
+  if g:spacevim_lint_engine ==# 'neomake'
     if !exists('g:loaded_neomake')
       return ''
     endif
@@ -244,9 +247,7 @@ if g:spacevim_lint_engine ==# 'neomake'
     let l =  warnings ? '%#SpaceVim_statusline_warn# ● ' . warnings . ' ' : ''
     let l .=  errors ? (warnings ? '' : ' ') . '%#SpaceVim_statusline_error#● ' . errors  . ' ' : ''
     return l
-  endfunction
-elseif g:spacevim_lint_engine ==# 'ale'
-  function! s:syntax_checking() abort
+  elseif g:spacevim_lint_engine ==# 'ale'
     if !exists('g:ale_enabled')
       return ''
     endif
@@ -256,9 +257,7 @@ elseif g:spacevim_lint_engine ==# 'ale'
     let l =  warnings ? '%#SpaceVim_statusline_warn# ● ' . warnings . ' ' : ''
     let l .=  errors ? (warnings ? '' : ' ') . '%#SpaceVim_statusline_error#● ' . errors  . ' ' : ''
     return l
-  endfunction
-else
-  function! s:syntax_checking() abort
+  else
     if !exists(':SyntasticCheck')
       return ''
     endif
@@ -268,8 +267,8 @@ else
     else
       return ''
     endif
-  endfunction
-endif
+  endif
+endfunction
 
 function! s:search_status() abort
   let save_cursor = getpos('.')
@@ -287,7 +286,11 @@ function! s:search_status() abort
   " errmsg in this function should be ignored, otherwise SPC f s will always
   " print errmsg.
   let v:errmsg = ''
-  return ' ' . (str2nr(tt) - str2nr(ct) + 1) . '/' . tt . ' '
+  if tt ==# 0
+    return ''
+  else
+    return ' ' . (str2nr(tt) - str2nr(ct) + 1) . '/' . tt . ' '
+  endif
 endfunction
 
 
@@ -304,6 +307,7 @@ let s:registed_sections = {
       \ 'minor mode lighters' : function('s:modes'),
       \ 'cursorpos' : function('s:cursorpos'),
       \ 'percentage' : function('s:percentage'),
+      \ 'totallines' : function('s:totallines'),
       \ 'time' : function('s:time'),
       \ 'date' : function('s:date'),
       \ 'whitespace' : function('s:whitespace'),
@@ -863,34 +867,37 @@ function! SpaceVim#layers#core#statusline#mode(mode) abort
 endfunction
 
 function! SpaceVim#layers#core#statusline#mode_text(mode) abort
+  let past_mode = &paste ? 'Paste ' . s:ilsep . ' ' : ''
+  let mode_text = ''
   let iedit_mode = get(w:, 'spacevim_iedit_mode', '')
   if a:mode ==# 'n'
     if !empty(iedit_mode)
       if iedit_mode ==# 'n'
-        return 'IEDIT-NORMAL'
-      else
-        return 'IEDIT-INSERT'
+        let mode_text = 'IEDIT-NORMAL'
+      elseif iedit_mode ==# 'i'
+        let mode_text = 'IEDIT-INSERT'
       endif
+    else
+      let mode_text = 'NORMAL'
     endif
-    return 'NORMAL'
   elseif a:mode ==# 'i'
-    return 'INSERT'
+    let mode_text = 'INSERT'
   elseif a:mode ==# 'R'
-    return 'REPLACE'
+    let mode_text = 'REPLACE'
   elseif a:mode ==# 'v'
-    return 'VISUAL'
+    let mode_text = 'VISUAL'
   elseif a:mode ==# 'V'
-    return 'V-LINE'
+    let mode_text = 'V-LINE'
   elseif a:mode ==# ''
-    return 'V-BLOCK'
+    let mode_text = 'V-BLOCK'
   elseif a:mode ==# 'c'
-    return 'COMMAND'
+    let mode_text = 'COMMAND'
   elseif a:mode ==# 't'
-    return 'TERMINAL'
+    let mode_text = 'TERMINAL'
   elseif a:mode ==# 'v' || a:mode ==# 'V' || a:mode ==# '^V' || a:mode ==# 's' || a:mode ==# 'S' || a:mode ==# '^S'
-    return 'VISUAL'
+    let mode_text = 'VISUAL'
   endif
-  return ' '
+  return past_mode . mode_text
 endfunction
 
 

@@ -1,7 +1,7 @@
 "=============================================================================
 " vim.vim --- SpaceVim vim layer
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -70,7 +70,7 @@ function! SpaceVim#layers#lang#vim#plugins() abort
         \ ['todesking/vint-syntastic',               { 'on_ft' : 'vim'}],
         \ ]
   call add(plugins,['tweekmonster/exception.vim', {'merged' : 0}])
-  call add(plugins,['wsdjeg/vim-lookup', {'merged' : 0}])
+  call add(plugins,[g:_spacevim_root_dir . 'bundle/vim-lookup', {'merged' : 0}])
   if !SpaceVim#layers#lsp#check_server('vimls') && !SpaceVim#layers#lsp#check_filetype('vim')
     call add(plugins,['Shougo/neco-vim',              { 'on_event' : 'InsertEnter', 'loadconf_before' : 1}])
     if g:spacevim_autocomplete_method ==# 'asyncomplete'
@@ -99,6 +99,7 @@ function! SpaceVim#layers#lang#vim#config() abort
     augroup spacevim_layer_lang_vim
       autocmd!
       autocmd BufWritePost *.vim call s:generate_doc()
+      autocmd FileType vim set comments=sO:\"\ -,mO:\"\ \ ,eO:\"\",:\"
     augroup END
   endif
   " if the lsp layer is enabled, we should disable default linter
@@ -108,7 +109,7 @@ function! SpaceVim#layers#lang#vim#config() abort
 endfunction
 
 function! s:on_exit(...) abort
-  let data = get(a:000, 2)
+  let data = get(a:000, 1)
   if data != 0
     call s:NOTI.notify('failed to generate doc!', 'WarningMsg')
   else

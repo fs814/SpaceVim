@@ -1,7 +1,7 @@
 "=============================================================================
 " core.vim --- SpaceVim core layer
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Wang Shidong < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -48,6 +48,7 @@ let s:FILE = SpaceVim#api#import('file')
 let s:MESSAGE = SpaceVim#api#import('vim#message')
 let s:CMP = SpaceVim#api#import('vim#compatible')
 let s:NOTI = SpaceVim#api#import('notify')
+let s:HI = SpaceVim#api#import('vim#highlight')
 
 
 function! SpaceVim#layers#core#plugins() abort
@@ -92,8 +93,7 @@ function! SpaceVim#layers#core#plugins() abort
   endif
   call add(plugins, [g:_spacevim_root_dir . 'bundle/gruvbox', {'loadconf' : 1, 'merged' : 0}])
   call add(plugins, [g:_spacevim_root_dir . 'bundle/open-browser.vim', {
-        \ 'merged' : 0, 'on_cmd' : ['OpenBrowser', 'OpenBrowserSearch', 'OpenBrowserSmartSearch'],
-        \ 'loadconf' : 1,
+        \ 'merged' : 0, 'loadconf' : 1,
         \}])
   call add(plugins, [g:_spacevim_root_dir . 'bundle/vim-grepper' ,              { 'on_cmd' : 'Grepper',
         \ 'loadconf' : 1} ])
@@ -153,6 +153,9 @@ function! SpaceVim#layers#core#config() abort
         \  ]
         \ ]
         \ , 1)
+  call SpaceVim#mapping#space#def('nnoremap', ['f', 'R'], 'call call('
+        \ . string(s:_function('s:rename_current_file')) . ', [])',
+        \ 'rename_current_file', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['f', 'a'], 'call call('
         \ . string(s:_function('s:save_as_new_file')) . ', [])',
         \ 'save-as-new-file', 1)
@@ -161,8 +164,6 @@ function! SpaceVim#layers#core#config() abort
   call SpaceVim#mapping#space#def('nnoremap', ['h', 'I'], 'call SpaceVim#issue#report()', 'report-issue-or-bug', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['h', 'l'], 'SPLayer -l', 'list-all-layers', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['h', 'L'], 'SPRuntimeLog', 'view-runtime-log', 1)
-  " @todo move this key binding to fuzzy layer
-  call SpaceVim#mapping#space#def('nnoremap', ['h', 'm'], 'Unite manpage', 'search available man pages', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['h', 'k'], 'LeaderGuide "[KEYs]"', 'show-top-level-bindings', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['j', '0'], 'm`^', 'jump-to-beginning-of-line', 0)
   call SpaceVim#mapping#space#def('nnoremap', ['j', '$'], 'm`g_', 'jump-to-end-of-line', 0)
@@ -261,6 +262,7 @@ function! SpaceVim#layers#core#config() abort
         \ 'call SpaceVim#mapping#kill_visible_buffer_choosewin()',
         \ 'delete-the-selected-buffer', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['b', '<C-d>'], 'call SpaceVim#mapping#clear_buffers()', 'kill-other-buffers', 1)
+  call SpaceVim#mapping#space#def('nnoremap', ['b', '<C-S-d>'], 'call SpaceVim#mapping#kill_buffer_expr()', 'kill-buffers-by-regexp', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['b', 'c'], 'call SpaceVim#mapping#clear_saved_buffers()', 'clear-all-saved-buffers', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['b', 'e'], 'call call('
         \ . string(s:_function('s:safe_erase_buffer')) . ', [])',
@@ -269,6 +271,9 @@ function! SpaceVim#layers#core#config() abort
   call SpaceVim#mapping#space#def('nnoremap', ['b', 'm'], 'call call('
         \ . string(s:_function('s:open_message_buffer')) . ', [])',
         \ 'open-message-buffer', 1)
+  call SpaceVim#mapping#space#def('nnoremap', ['b', 'o'], 'call call('
+        \ . string(s:_function('s:only_buf_win')) . ', [])',
+        \ 'kill-other-buffers-and-windows', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['b', 'P'], 'normal! ggdG"+P', 'copy-clipboard-to-whole-buffer', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['b', 'R'], 'call call('
         \ . string(s:_function('s:safe_revert_buffer')) . ', [])',
@@ -316,7 +321,9 @@ function! SpaceVim#layers#core#config() abort
     call SpaceVim#mapping#space#def('nnoremap', ['b', 't'], 'exe "Defx -no-toggle " . fnameescape(expand("%:p:h"))', 'show-file-tree-at-buffer-dir', 1)
   endif
   call SpaceVim#mapping#space#def('nnoremap', ['f', 'y'], 'call SpaceVim#util#CopyToClipboard()', 'show-and-copy-buffer-filename', 1)
-  call SpaceVim#mapping#space#def('nnoremap', ['f', 'Y'], 'call SpaceVim#util#CopyToClipboard(1)', 'show-and-copy-buffer-filename', 1)
+  nnoremap <silent> <Plug>YankGitRemoteURL :call SpaceVim#util#CopyToClipboard(2)<Cr>
+  vnoremap <silent> <Plug>YankGitRemoteURL :<C-u>call SpaceVim#util#CopyToClipboard(3)<Cr>
+  call SpaceVim#mapping#space#def('nmap', ['f', 'Y'], '<Plug>YankGitRemoteURL', 'yank-remote-url', 0, 1)
   let g:_spacevim_mappings_space.f.v = {'name' : '+Vim/SpaceVim'}
   call SpaceVim#mapping#space#def('nnoremap', ['f', 'v', 'v'], 'let @+=g:spacevim_version | echo g:spacevim_version', 'display-and-copy-version', 1)
   let lnum = expand('<slnum>') + s:lnum - 1
@@ -541,12 +548,12 @@ function! s:jump_last_change() abort
 endfunction
 
 function! s:split_string(newline) abort
-  if s:is_string(line('.'), col('.'))
+  if s:HI.is_string(line('.'), col('.'))
     let save_cursor = getcurpos()
     let c = col('.')
     let sep = ''
     while c > 0
-      if s:is_string(line('.'), c)
+      if s:HI.is_string(line('.'), c)
         let c -= 1
       else
         if !empty(get(get(g:string_info, &filetype, {}), 'quotes_hi', []))
@@ -576,18 +583,6 @@ function! s:split_string(newline) abort
     endif
     call setpos('.', save_cursor)
   endif
-endfunction
-
-
-" @toto add sting highlight for other filetype
-let s:string_hi = {
-      \ 'c' : 'cCppString',
-      \ 'cpp' : 'cCppString',
-      \ 'python' : 'pythonString',
-      \ }
-
-function! s:is_string(l, c) abort
-  return synIDattr(synID(a:l, a:c, 1), 'name') == get(s:string_hi, &filetype, &filetype . 'String')
 endfunction
 
 " function() wrapper
@@ -635,6 +630,11 @@ function! s:open_message_buffer() abort
   normal! G
   setlocal nomodifiable
   nnoremap <buffer><silent> q :call <SID>close_message_buffer()<CR>
+endfunction
+
+function! s:only_buf_win() abort
+  only
+  call SpaceVim#mapping#clear_saved_buffers()
 endfunction
 
 function! s:close_message_buffer() abort
@@ -979,6 +979,34 @@ augroup FileExplorer
   autocmd!
 augroup END
 
+
+function! s:rename_current_file() abort
+  let current_fname = bufname()
+  if empty(current_fname)
+    echo 'can not rename empty filename!'
+    return
+  endif
+  let input = input('Rename to: ', fnamemodify(current_fname, ':p'), 'file')
+  noautocmd normal! :
+  if !empty(input)
+    exe 'silent! file ' . input
+    exe 'silent! w '
+    call delete(current_fname)
+    if v:errmsg !=# ''
+      echohl ErrorMsg
+      echo  v:errmsg
+      echohl None
+    else
+      echohl Delimiter
+      echo  fnamemodify(bufname(), ':.:gs?[\\/]?/?') . ' Renamed'
+      echohl None
+    endif
+  else
+    echo 'canceled!'
+  endif
+
+  
+endfunction
 
 function! s:save_as_new_file() abort
   let current_fname = bufname()

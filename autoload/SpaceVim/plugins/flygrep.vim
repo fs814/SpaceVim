@@ -1,7 +1,7 @@
 "=============================================================================
 " flygrep.vim --- Grep on the fly in SpaceVim
-" Copyright (c) 2016-2021 Wang Shidong & Contributors
-" Author: Shidong Wang < wsdjeg at 163.com >
+" Copyright (c) 2016-2022 Wang Shidong & Contributors
+" Author: Shidong Wang < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
@@ -374,7 +374,7 @@ function! s:close_grep_job() abort
   endif
   call timer_stop(s:grep_timer_id)
   call timer_stop(s:preview_timer_id)
-  noautocmd normal! "_ggdG
+  noautocmd normal! gg"_dG
   call s:update_statusline()
   let s:complete_input_history_num = [0,0]
 endfunction
@@ -755,7 +755,7 @@ function! s:previous_match_history() abort
   endif
   let s:complete_input_history_num[0] += 1
   let s:MPT._prompt.begin = s:complete_input_history(s:complete_input_history_base, s:complete_input_history_num)
-  noautocmd normal! "_ggdG
+  noautocmd normal! gg"_dG
   call s:MPT._handle_fly(s:MPT._prompt.begin . s:MPT._prompt.cursor .s:MPT._prompt.end)
 endfunction
 
@@ -767,7 +767,7 @@ function! s:next_match_history() abort
   endif
   let s:complete_input_history_num[1] += 1
   let s:MPT._prompt.begin = s:complete_input_history(s:complete_input_history_base, s:complete_input_history_num)
-  noautocmd normal! "_ggdG
+  noautocmd normal! gg"_dG
   call s:MPT._handle_fly(s:MPT._prompt.begin . s:MPT._prompt.cursor .s:MPT._prompt.end)
 endfunction
 
@@ -819,14 +819,14 @@ let s:MPT._function_key = {
 if has('nvim')
   call extend(s:MPT._function_key, 
         \ {
-          \ "\x80\xfdJ" : function('s:previous_item'),
-          \ "\x80\xfc \x80\xfdJ" : function('s:previous_item'),
-          \ "\x80\xfc@\x80\xfdJ" : function('s:previous_item'),
-          \ "\x80\xfc`\x80\xfdJ" : function('s:previous_item'),
-          \ "\x80\xfdK" : function('s:next_item'),
-          \ "\x80\xfc \x80\xfdK" : function('s:next_item'),
-          \ "\x80\xfc@\x80\xfdK" : function('s:next_item'),
-          \ "\x80\xfc`\x80\xfdK" : function('s:next_item'),
+          \ "\x80\xfdK" : function('s:previous_item'),
+          \ "\x80\xfc \x80\xfdK" : function('s:previous_item'),
+          \ "\x80\xfc@\x80\xfdK" : function('s:previous_item'),
+          \ "\x80\xfc`\x80\xfdK" : function('s:previous_item'),
+          \ "\x80\xfdL" : function('s:next_item'),
+          \ "\x80\xfc \x80\xfdL" : function('s:next_item'),
+          \ "\x80\xfc@\x80\xfdL" : function('s:next_item'),
+          \ "\x80\xfc`\x80\xfdL" : function('s:next_item'),
           \ }
           \ )
 endif
@@ -876,9 +876,15 @@ function! SpaceVim#plugins#flygrep#open(argv) abort
   let save_tve = &t_ve
   setlocal t_ve=
   let cursor_hi = {}
-  if has('gui_running')
-    let cursor_hi = s:HI.group2dict('Cursor')
-    call s:HI.hide_in_normal('Cursor')
+  let cursor_hi = s:HI.group2dict('Cursor')
+  let lcursor_hi = s:HI.group2dict('lCursor')
+  let guicursor = &guicursor
+  call s:HI.hide_in_normal('Cursor')
+  call s:HI.hide_in_normal('lCursor')
+  " hi Cursor ctermbg=16 ctermfg=16 guifg=#282c34 guibg=#282c34
+  " hi lCursor ctermbg=16 ctermfg=16 guifg=#282c34 guibg=#282c34
+  if has('nvim')
+    set guicursor+=a:Cursor/lCursor
   endif
   " setlocal nomodifiable
   setf SpaceVimFlyGrep
@@ -929,9 +935,9 @@ function! SpaceVim#plugins#flygrep#open(argv) abort
   endif
   call s:LOGGER.info('FlyGrep ending    ===========================')
   let &t_ve = save_tve
-  if has('gui_running')
-    call s:HI.hi(cursor_hi)
-  endif
+  call s:HI.hi(cursor_hi)
+  call s:HI.hi(lcursor_hi)
+  let &guicursor = guicursor
 endfunction
 " }}}
 
