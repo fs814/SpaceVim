@@ -37,7 +37,7 @@ call defx#custom#option('_', {
       \ 'direction': s:direction,
       \ 'show_ignored_files': g:_spacevim_filetree_show_hidden_files,
       \ 'buffer_name': '',
-      \ 'toggle': 1,
+      \ 'toggle': 0,
       \ 'resume': 1
       \ })
 
