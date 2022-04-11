@@ -79,7 +79,9 @@ function! s:update_history() abort
   if !isdirectory(expand(g:spacevim_data_dir.'SpaceVim'))
     call mkdir(expand(g:spacevim_data_dir.'SpaceVim'))
   endif
-  call writefile([s:JSON.json_encode(s:grep_history)], expand(g:spacevim_data_dir.'SpaceVim/flygrep_history'))
+  "call s:LOGGER.info('FlyGrep update_history ===========================' . g:spacevim_data_dir)
+  "fs814
+  "call writefile([s:JSON.json_encode(s:grep_history)], expand(g:spacevim_data_dir.'SpaceVim/flygrep_history'))
 endfunction
 let s:grep_history = s:read_histroy()
 let s:complete_input_history_num = [0,0]
@@ -519,6 +521,7 @@ function! s:open_item() abort
     let s:preview_able = 0
     call s:close_flygrep_win()
     call s:update_history()
+    call s:LOGGER.info('FlyGrep open_item ===========================' . filename)
     call s:BUFFER.open_pos('edit', filename, linenr, colum)
     noautocmd normal! :
   endif
