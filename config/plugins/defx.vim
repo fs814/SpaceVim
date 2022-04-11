@@ -37,7 +37,7 @@ call defx#custom#option('_', {
       \ 'direction': s:direction,
       \ 'show_ignored_files': g:_spacevim_filetree_show_hidden_files,
       \ 'buffer_name': '',
-      \ 'toggle': 1,
+      \ 'toggle': 0,
       \ 'resume': 1
       \ })
 
@@ -61,10 +61,20 @@ augroup vfinit
   autocmd FileType defx call s:defx_init()
   " auto close last defx windows
   autocmd BufEnter * nested if
-        \ (!has('vim_starting') && winnr('$') == 1  && g:_spacevim_autoclose_filetree
+        \ (!has('vim_starting') && s:win_count() == 1  && g:_spacevim_autoclose_filetree
         \ && &filetype ==# 'defx') |
         \ call s:close_last_vimfiler_windows() | endif
 augroup END
+
+function! s:win_count() abort
+  if has('nvim') && exists('*nvim_win_get_config')
+    return len(filter(range(1, winnr('$')), '!has_key(nvim_win_get_config(win_getid(v:val)), "col")'))
+  elseif exists('*popup_getoptions')
+    return len(filter(range(1, winnr('$')), '!has_key(popup_getoptions(win_getid(v:val)), "col")'))
+  else
+    return winnr('$')
+  endif
+endfunction
 
 " in this function, we should check if shell terminal still exists,
 " then close the terminal job before close vimfiler

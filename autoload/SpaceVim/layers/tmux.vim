@@ -129,6 +129,7 @@ let s:separators = {
       \ 'slant' : ["\ue0b8", "\ue0ba"],
       \ 'brace' : ["\ue0d2", "\ue0d4"],
       \ 'fire' : ["\ue0c0", "\ue0c2"],
+      \ 'bar' : ['|', '|'],
       \ 'nil' : ['', ''],
       \ }
 

@@ -79,7 +79,9 @@ function! s:update_history() abort
   if !isdirectory(expand(g:spacevim_data_dir.'SpaceVim'))
     call mkdir(expand(g:spacevim_data_dir.'SpaceVim'))
   endif
-  call writefile([s:JSON.json_encode(s:grep_history)], expand(g:spacevim_data_dir.'SpaceVim/flygrep_history'))
+  "call s:LOGGER.info('FlyGrep update_history ===========================' . g:spacevim_data_dir)
+  "fs814
+  "call writefile([s:JSON.json_encode(s:grep_history)], expand(g:spacevim_data_dir.'SpaceVim/flygrep_history'))
 endfunction
 let s:grep_history = s:read_histroy()
 let s:complete_input_history_num = [0,0]
@@ -139,8 +141,8 @@ function! s:get_search_cmd(expr) abort
     let cmd += [a:expr] 
     " when using rg, ag, need to add '.' at the end.
     if s:grep_exe ==# 'rg' || s:grep_exe ==# 'ag' || s:grep_exe ==# 'pt'
-    ""  let cmd += ['.']
-        let cmd += [s:grep_dir]
+      "let cmd += ['.']
+      let cmd += [s:grep_dir]
     endif
     let cmd += s:grep_ropt
   endif
@@ -519,6 +521,7 @@ function! s:open_item() abort
     let s:preview_able = 0
     call s:close_flygrep_win()
     call s:update_history()
+    call s:LOGGER.info('FlyGrep open_item ===========================' . filename)
     call s:BUFFER.open_pos('edit', filename, linenr, colum)
     noautocmd normal! :
   endif
@@ -819,14 +822,14 @@ let s:MPT._function_key = {
 if has('nvim')
   call extend(s:MPT._function_key, 
         \ {
-          \ "\x80\xfdJ" : function('s:previous_item'),
-          \ "\x80\xfc \x80\xfdJ" : function('s:previous_item'),
-          \ "\x80\xfc@\x80\xfdJ" : function('s:previous_item'),
-          \ "\x80\xfc`\x80\xfdJ" : function('s:previous_item'),
-          \ "\x80\xfdK" : function('s:next_item'),
-          \ "\x80\xfc \x80\xfdK" : function('s:next_item'),
-          \ "\x80\xfc@\x80\xfdK" : function('s:next_item'),
-          \ "\x80\xfc`\x80\xfdK" : function('s:next_item'),
+          \ "\x80\xfdK" : function('s:previous_item'),
+          \ "\x80\xfc \x80\xfdK" : function('s:previous_item'),
+          \ "\x80\xfc@\x80\xfdK" : function('s:previous_item'),
+          \ "\x80\xfc`\x80\xfdK" : function('s:previous_item'),
+          \ "\x80\xfdL" : function('s:next_item'),
+          \ "\x80\xfc \x80\xfdL" : function('s:next_item'),
+          \ "\x80\xfc@\x80\xfdL" : function('s:next_item'),
+          \ "\x80\xfc`\x80\xfdL" : function('s:next_item'),
           \ }
           \ )
 endif
@@ -876,9 +879,15 @@ function! SpaceVim#plugins#flygrep#open(argv) abort
   let save_tve = &t_ve
   setlocal t_ve=
   let cursor_hi = {}
-  if has('gui_running')
-    let cursor_hi = s:HI.group2dict('Cursor')
-    call s:HI.hide_in_normal('Cursor')
+  let cursor_hi = s:HI.group2dict('Cursor')
+  let lcursor_hi = s:HI.group2dict('lCursor')
+  let guicursor = &guicursor
+  call s:HI.hide_in_normal('Cursor')
+  call s:HI.hide_in_normal('lCursor')
+  " hi Cursor ctermbg=16 ctermfg=16 guifg=#282c34 guibg=#282c34
+  " hi lCursor ctermbg=16 ctermfg=16 guifg=#282c34 guibg=#282c34
+  if has('nvim')
+    set guicursor+=a:Cursor/lCursor
   endif
   " setlocal nomodifiable
   setf SpaceVimFlyGrep
@@ -929,9 +938,9 @@ function! SpaceVim#plugins#flygrep#open(argv) abort
   endif
   call s:LOGGER.info('FlyGrep ending    ===========================')
   let &t_ve = save_tve
-  if has('gui_running')
-    call s:HI.hi(cursor_hi)
-  endif
+  call s:HI.hi(cursor_hi)
+  call s:HI.hi(lcursor_hi)
+  let &guicursor = guicursor
 endfunction
 " }}}
 

@@ -1188,10 +1188,23 @@ let g:spacevim_project_auto_root = 1
 "   let g:spacevim_project_rooter_outermost = 0
 " <
 let g:spacevim_project_rooter_outermost = 1
+""
+" @section commandline_prompt, options-commandline_prompt
+" @parentsection options
+" Config the command line prompt for flygrep and denite etc.
+" Default is `>`, for example:
+" >
+"   commandline_prompt = '➭'
+" <
 
 ""
 " Config the command line prompt for flygrep and denite etc.
-let g:spacevim_commandline_prompt = '➭'
+let g:spacevim_commandline_prompt = '>'
+
+""
+" @section todo_labels, options-todo_labels
+" @parentsection options
+" Option for setting todo labels in current project.
 
 ""
 " Option for setting todo labels in current project.
@@ -1279,10 +1292,16 @@ let g:spacevim_src_root                = 'E:\sources\'
 " Google and Twitter.
 let g:spacevim_hosts_url
       \ = 'https://raw.githubusercontent.com/racaljk/hosts/master/hosts'
+""
+" @section wildignore, options-wildignore
+" @parentsection options
+" A list of file patterns when file match it will be ignored.
+" >
+"   wildignore =  '*/tmp/*,*.so,*.swp,*.zip,*.class,tags,*.jpg,*.ttf,*.TTF,*.png,*/target/*,.git,.svn,.hg,.DS_Store,*.svg'
+" <
+
 let g:spacevim_wildignore
-      \ = '*/tmp/*,*.so,*.swp,*.zip,*.class,tags,*.jpg,
-      \*.ttf,*.TTF,*.png,*/target/*,
-      \.git,.svn,.hg,.DS_Store,*.svg'
+      \ = '*/tmp/*,*.so,*.swp,*.zip,*.class,tags,*.jpg,*.ttf,*.TTF,*.png,*/target/*,.git,.svn,.hg,.DS_Store,*.svg'
 
 " }}}
 
@@ -1519,6 +1538,7 @@ function! SpaceVim#end() abort
       " enable blinking mode-sensitive cursor
       set guicursor=n-v-c:block-blinkon10,i-ci-ve:ver25-blinkon10,r-cr:hor20,o:hor50
     endif
+    set guicursor+=a:Cursor/lCursor
   endif
   filetype plugin indent on
   syntax on

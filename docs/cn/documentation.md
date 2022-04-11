@@ -307,6 +307,18 @@ git -C ~/.SpaceVim pull
 除了 `on_cmd` 以外，还有一些其它的选项，可以通过
 `:h dein-options` 查阅。
 
+如果需要添加多个自定义插件，可以参考如下设置：
+
+```toml
+[[custom_plugins]]
+    repo = 'lilydjwg/colorizer'
+    merged = false
+
+[[custom_plugins]]
+    repo = 'joshdick/onedark.vim'
+    merged = false
+```
+
 **禁用插件**
 
 SpaceVim 默认安装了一些插件，如果需要禁用某个插件，可以通过 `~/.SpaceVim.d/init.toml` 的 `[options]` 片段中的 `disabled_plugins` 这一选项来操作：
@@ -1365,7 +1377,7 @@ SpaceVim 选项 `window_leader` 的值来设为其它按键：
 | `SPC f f`            | 在当前文件所在文件夹搜索文件                           |
 | `SPC f F`            | 在当前文件所在的文件夹搜索光标下的文件                 |
 | `SPC f o`            | 代开文件树，并定位到当前文件                           |
-| `SPC f R`            | rename the current file(TODO)                          |
+| `SPC f R`            | 重命名当前文件                                         |
 | `SPC f s` / `Ctrl-s` | 保存文件 (:w)                                          |
 | `SPC f a`            | 另存为新的文件                                         |
 | `SPC f W`            | 使用管理员模式保存                                     |

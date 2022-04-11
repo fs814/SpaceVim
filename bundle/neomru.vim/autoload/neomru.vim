@@ -163,6 +163,12 @@ function! s:mru.save(...) abort
     call self.validate()
   endif
 
+  "echo "global " . g:neomru#file_mru_path
+  "echo "writefile " . self.mru_file
+  if empty(self.mru_file)
+    let self.mru_file = g:neomru#file_mru_path
+  endif
+
   call s:writefile(self.mru_file,
         \ [self.version] + self.candidates)
 

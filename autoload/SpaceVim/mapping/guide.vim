@@ -41,6 +41,7 @@ endfunction "}}}
 
 function! SpaceVim#mapping#guide#register_prefix_descriptions(key, dictname) abort " {{{
   let key = a:key ==? '<Space>' ? ' ' : a:key
+  "let key = a:key ==? '<tab>' ? '\[<tab>\]' : a:key
   if !exists('s:desc_lookup')
     call s:create_cache()
   endif
@@ -113,6 +114,7 @@ function! s:start_parser(key, dict) abort " {{{
     return
   endif
   let key = a:key ==? ' ' ? '<Space>' : a:key
+  "let key = char2nr(a:key) == 9 ? '[<tab>]' : key
   let key = a:key ==? '<tab>' ? '\[<tab>\]' : key
 
   0verbose let readmap = s:CMP.execute('map ' . key, 'silent')
@@ -138,6 +140,7 @@ function! s:start_parser(key, dict) abort " {{{
     let mapd.lhs = substitute(mapd.lhs, '<Space>', ' ', 'g')
     let mapd.lhs = substitute(mapd.lhs, '<Tab>', '<C-I>', 'g')
     let mapd.rhs = substitute(mapd.rhs, '<SID>', '<SNR>'.mapd['sid'].'_', 'g')
+
     if mapd.lhs !=# '' && mapd.display !~# 'LeaderGuide.*'
       let mapd.lhs = s:string_to_keys(mapd.lhs)
       if (visual && match(mapd.mode, '[vx ]') >= 0) ||
@@ -152,6 +155,7 @@ function! s:add_map_to_dict(map, level, dict) abort " {{{
   if len(a:map.lhs) > a:level+1
     let curkey = a:map.lhs[a:level]
     let nlevel = a:level+1
+
     if !has_key(a:dict, curkey)
       let a:dict[curkey] = { 'name' : g:leaderGuide_default_group_name }
       " mapping defined already, flatten this map
@@ -316,11 +320,22 @@ function! s:create_string(layout) abort " {{{
   let rows = []
   let row = 0
   let col = 0
+
+
+
   let smap = sort(filter(keys(s:lmap), 'v:val !=# "name"'), function('s:compare_key'))
+
+
   for k in smap
     let desc = type(s:lmap[k]) == type({}) ? s:lmap[k].name : s:lmap[k][1]
+
+
     let displaystring = '['. k .'] '.desc
     let crow = get(rows, row, [])
+
+    let fsdesc = type(s:lmap[k]) == type({}) ? s:lmap[k].name:" empty "
+    call SpaceVim#logger#info('create_string ' . desc . ' lmap ' . fsdesc)
+
     if empty(crow)
       call add(rows, crow)
     endif
@@ -604,6 +619,7 @@ if s:SL.support_float()
     let keys = get(s:, 'prefix_key_inp', [])
     call SpaceVim#logger#info('key binding guide float statusline statusline 1:')
     " let keys = substitute(keys, '\', '\\\', 'g')
+    call SpaceVim#logger#info('key binding guide float statusline prefix_key:' . join(keys, ' '))
     noautocmd let winid = s:SL.open_float([
           \ ['Guide: ', 'LeaderGuiderPrompt'],
           \ [' ', 'LeaderGuiderSep1'],
@@ -767,6 +783,7 @@ function! SpaceVim#mapping#guide#start_by_prefix(vis, key) abort " {{{
     call s:start_parser(key, s:cached_dicts[key])
   endif
 
+  "let key = char2nr(a:key) == 9 ? '<tab>' : a:key
   if has_key(s:desc_lookup, key) || has_key(s:desc_lookup , 'top')
     let rundict = s:create_target_dict(key)
   else
@@ -832,7 +849,7 @@ call SpaceVim#plugins#help#regist_root({'[,]' : g:_spacevim_mappings_comma})
 call SpaceVim#mapping#guide#register_prefix_descriptions(
       \ '<tab>',
       \ 'g:_spacevim_mappings_tabkey')
-call SpaceVim#plugins#help#regist_root({'[tabkey]' : g:_spacevim_mappings_tabkey})
+call SpaceVim#plugins#help#regist_root({'[<tab>]' : g:_spacevim_mappings_tabkey})
 let [s:lsep, s:rsep] = SpaceVim#layers#core#statusline#rsep()
 let &cpo = s:save_cpo
 unlet s:save_cpo

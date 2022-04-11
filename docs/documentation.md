@@ -299,6 +299,18 @@ You can also use the url of the repository, for example:
     merged = false
 ```
 
+For adding multiple custom plugins:
+
+```toml
+[[custom_plugins]]
+    repo = 'lilydjwg/colorizer'
+    merged = false
+
+[[custom_plugins]]
+    repo = 'joshdick/onedark.vim'
+    merged = false
+```
+
 **disable existing plugins**
 
 If you want to disable plugins which are added by SpaceVim,
@@ -1437,7 +1449,7 @@ Files manipulation commands (start with `f`):
 | `SPC f f`    | fuzzy find files in buffer directory                                    |
 | `SPC f F`    | fuzzy find cursor file in buffer directory                              |
 | `SPC f o`    | Find current file in file tree                                          |
-| `SPC f R`    | rename the current file(TODO)                                           |
+| `SPC f R`    | rename the current file                                                 |
 | `SPC f s`    | save a file                                                             |
 | `SPC f a`    | save as new file name                                                   |
 | `SPC f S`    | save all files                                                          |
