@@ -113,6 +113,7 @@ function! s:start_parser(key, dict) abort " {{{
     return
   endif
   let key = a:key ==? ' ' ? '<Space>' : a:key
+  let key = a:key ==? '<tab>' ? '\[<tab>\]' : key
 
   0verbose let readmap = s:CMP.execute('map ' . key, 'silent')
 
@@ -132,6 +133,7 @@ function! s:start_parser(key, dict) abort " {{{
       continue
     endif
     let mapd.display = s:format_displaystring(mapd.rhs)
+    let mapd.lhs = substitute(mapd.lhs, '\[<Tab>\]', '', 'g')
     let mapd.lhs = substitute(mapd.lhs, key, '', '')
     let mapd.lhs = substitute(mapd.lhs, '<Space>', ' ', 'g')
     let mapd.lhs = substitute(mapd.lhs, '<Tab>', '<C-I>', 'g')
@@ -441,6 +443,7 @@ endfunction " }}}
 " @vimlint(EVL102, 0, l:string)
 
 function! s:handle_input(input) abort " {{{
+  call SpaceVim#logger#info('key binding guide float statusline guide handle_input:')
   call s:winclose()
   if type(a:input) ==? type({})
     let s:lmap = a:input
@@ -459,6 +462,7 @@ endfunction " }}}
 
 " wait for in input sub function should be not block vim
 function! s:wait_for_input() abort " {{{
+  call SpaceVim#logger#info('key binding guide float statusline statusline wait_for_input:')
   redraw!
   let inp = s:VIM.getchar()
   if inp ==# "\<Esc>"
@@ -518,6 +522,7 @@ endfunction
 " change this func, do not focus to the new windows, and return winid.
 
 function! s:winopen() abort " {{{
+  call SpaceVim#logger#info('key binding guide float statusline statusline winopen:')
   call s:highlight_cursor()
   let pos = g:leaderGuide_position ==? 'topleft' ? 'topleft' : 'botright'
   if s:FLOATING.exists()
@@ -591,11 +596,13 @@ if s:SL.support_float()
   function! s:updateStatusline() abort
     call SpaceVim#mapping#guide#theme#hi()
     let gname = get(s:guide_group, 'name', '')
+    call SpaceVim#logger#info('key binding guide float statusline statusline 0:')
     if !empty(gname)
       let gname = ' - ' . gname[1:]
       " let gname = substitute(gname,' ', '\\ ', 'g')
     endif
     let keys = get(s:, 'prefix_key_inp', [])
+    call SpaceVim#logger#info('key binding guide float statusline statusline 1:')
     " let keys = substitute(keys, '\', '\\\', 'g')
     noautocmd let winid = s:SL.open_float([
           \ ['Guide: ', 'LeaderGuiderPrompt'],
@@ -620,6 +627,7 @@ else
       let gname = ' - ' . gname[1:]
     endif
     let keys = get(s:, 'prefix_key_inp', [])
+    call SpaceVim#logger#info('key binding guide float statusline statusline 2:')
     call setbufvar(s:bufnr, '&statusline', '%#LeaderGuiderPrompt# Guide: ' .
           \ '%#LeaderGuiderSep1#' . s:lsep .
           \ '%#LeaderGuiderName# ' .
@@ -698,6 +706,7 @@ function! s:page_up() abort " {{{
 endfunction " }}}
 
 function! s:handle_submode_mapping(cmd) abort " {{{
+  call SpaceVim#logger#info('key binding guide float statusline statusline handle_submode_mapping:')
   let s:guide_help_mode = 0
   call s:updateStatusline()
   if a:cmd ==# 'n'
@@ -750,17 +759,20 @@ function! SpaceVim#mapping#guide#start_by_prefix(vis, key) abort " {{{
     let s:reg = v:register != s:get_register() ? '"'.v:register : ''
   endif
 
-  if !has_key(s:cached_dicts, a:key) || g:leaderGuide_run_map_on_popup
+  let key = char2nr(a:key) == 9 ? '<tab>' : a:key
+
+  if !has_key(s:cached_dicts, key) || g:leaderGuide_run_map_on_popup
     "first run
-    let s:cached_dicts[a:key] = {}
-    call s:start_parser(a:key, s:cached_dicts[a:key])
+    let s:cached_dicts[key] = {}
+    call s:start_parser(key, s:cached_dicts[key])
   endif
 
-  if has_key(s:desc_lookup, a:key) || has_key(s:desc_lookup , 'top')
-    let rundict = s:create_target_dict(a:key)
+  if has_key(s:desc_lookup, key) || has_key(s:desc_lookup , 'top')
+    let rundict = s:create_target_dict(key)
   else
-    let rundict = s:cached_dicts[a:key]
+    let rundict = s:cached_dicts[key]
   endif
+
   let s:lmap = rundict
   call s:start_buffer()
 endfunction " }}}
@@ -813,6 +825,14 @@ call SpaceVim#mapping#guide#register_prefix_descriptions(
       \ 'z',
       \ 'g:_spacevim_mappings_z')
 call SpaceVim#plugins#help#regist_root({'[z]' : g:_spacevim_mappings_z})
+call SpaceVim#mapping#guide#register_prefix_descriptions(
+      \ ',',
+      \ 'g:_spacevim_mappings_comma')
+call SpaceVim#plugins#help#regist_root({'[,]' : g:_spacevim_mappings_comma})
+call SpaceVim#mapping#guide#register_prefix_descriptions(
+      \ '<tab>',
+      \ 'g:_spacevim_mappings_tabkey')
+call SpaceVim#plugins#help#regist_root({'[tabkey]' : g:_spacevim_mappings_tabkey})
 let [s:lsep, s:rsep] = SpaceVim#layers#core#statusline#rsep()
 let &cpo = s:save_cpo
 unlet s:save_cpo

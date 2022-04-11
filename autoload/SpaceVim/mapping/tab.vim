@@ -14,7 +14,7 @@ if g:spacevim_snippet_engine ==# 'neosnippet'
     if neosnippet#expandable() && getline('.')[col('.')-2] ==# '(' && !pumvisible()
       return "\<Plug>(neosnippet_expand)"
     elseif neosnippet#jumpable()
-          \ && getline('.')[col('.')-2] ==# '(' && !pumvisible() 
+          \ && getline('.')[col('.')-2] ==# '(' && !pumvisible()
           \ && !neosnippet#expandable()
       return "\<plug>(neosnippet_jump)"
     elseif neosnippet#expandable_or_jumpable() && getline('.')[col('.')-2] !=#'('
@@ -53,6 +53,5 @@ elseif g:spacevim_snippet_engine ==# 'ultisnips'
     return "\<C-R>=SpaceVim#mapping#tab#expandable()\<cr>"
   endfunction
 endif
-
-
 " vim:set et sw=2 cc=80:
+

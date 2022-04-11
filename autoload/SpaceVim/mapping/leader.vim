@@ -183,6 +183,8 @@ endfunction
 
 
 function! SpaceVim#mapping#leader#getName(key) abort
+  call SpaceVim#logger#info('key binding guide float statusline winid fs:')
+  call SpaceVim#logger#debug('leader getName')
   if a:key ==# ' '
     return '[SPC]'
   elseif a:key ==# 'g'
@@ -193,6 +195,9 @@ function! SpaceVim#mapping#leader#getName(key) abort
     return '[WIN]'
   elseif a:key ==# '\'
     return '<leader>'
+  elseif a:key ==# '<tab>'
+    call SpaceVim#logger#debug('return tabkey')
+    return '[tabkey]'
   else
     return ''
   endif

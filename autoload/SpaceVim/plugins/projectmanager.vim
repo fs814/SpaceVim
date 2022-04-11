@@ -167,6 +167,8 @@ else
     endif
     call s:LOGGER.info('buffer name: ' . bufname)
     if a:dir ==# s:FILE.unify_path(getcwd())
+      let currentcwd = getcwd()
+      call s:LOGGER.info('change_dir from ' . a:dir . ' to ' . currentcwd)
       call s:LOGGER.info('same as current directory, no need to change.')
     else
       call s:LOGGER.info('change to root: ' . a:dir)
