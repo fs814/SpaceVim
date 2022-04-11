@@ -397,7 +397,7 @@ function! s:writefile(path, list) abort
     call mkdir(fnamemodify(path, ':h'), 'p')
   endif
 
-  call writefile(a:list, path)
+  "call writefile(a:list, path)
 endfunction
 function! s:uniq(list, ...) abort
   return s:uniq_by(a:list, 'tolower(v:val)')
