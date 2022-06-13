@@ -26,12 +26,14 @@ description: "General documentation about how to use SpaceVim, including the qui
   - [Colorschemes](#colorschemes)
   - [Font](#font)
   - [Mouse](#mouse)
+  - [Scrollbar](#scrollbar)
   - [UI Toggles](#ui-toggles)
   - [Statusline](#statusline)
   - [Tabline](#tabline)
   - [File tree](#file-tree)
     - [File tree navigation](#file-tree-navigation)
     - [Open file with file tree.](#open-file-with-file-tree)
+    - [Override filetree key bindings](#override-filetree-key-bindings)
 - [General usage](#general-usage)
   - [Native functions](#native-functions)
   - [Command line mode key bindings](#command-line-mode-key-bindings)
@@ -73,6 +75,7 @@ description: "General documentation about how to use SpaceVim, including the qui
     - [Commands starting with `z`](#commands-starting-with-z)
 - [Advanced usage](#advanced-usage)
   - [Managing projects](#managing-projects)
+    - [Show project info on cmdline](#show-project-info-on-cmdline)
     - [Searching files in project](#searching-files-in-project)
     - [Custom alternate file](#custom-alternate-file)
   - [Bookmarks management](#bookmarks-management)
@@ -84,14 +87,12 @@ description: "General documentation about how to use SpaceVim, including the qui
   - [Todo manager](#todo-manager)
   - [Replace text with iedit](#replace-text-with-iedit)
     - [iedit states key bindings](#iedit-states-key-bindings)
-  - [Code runner and REPL](#code-runner-and-repl)
+  - [Code runner](#code-runner)
+  - [Read Eval Print Loop](#read-eval-print-loop)
   - [Highlight current symbol](#highlight-current-symbol)
   - [Error handling](#error-handling)
   - [EditorConfig](#editorconfig)
   - [Vim Server](#vim-server)
-- [Achievements](#achievements)
-  - [issues](#issues)
-  - [Stars, forks and watchers](#stars-forks-and-watchers)
 
 <!-- vim-markdown-toc -->
 
@@ -128,13 +129,12 @@ packages tuned by power users and bugs are fixed quickly.
 ## Highlighted features
 
 - **Great documentation:** access documentation in SpaceVim with `:h SpaceVim`.
-- **Minimalistic and nice graphical UI:** you'll love the awesome UI and its useful features.
-- **Keep your fingers on the home row:** for quicker editing with support for QWERTY and BEPO layouts.
-- **Mnemonic key bindings:** commands have mnemonic prefixes like `[WIN]` for all the window and buffer commands or `[Unite]` for the unite work flow commands.
+- **nice UI:** you'll love the awesome UI and its useful features.
+- **Mnemonic key bindings:** key binding guide will be displayed automatically
 - **Fast boot time:** Lazy-load 90% of plugins with [dein.vim](https://github.com/Shougo/dein.vim)
 - **Lower the risk of RSI:** by heavily using the space bar instead of modifiers.
 - **Batteries included:** discover hundreds of ready-to-use packages nicely organised in configuration layers following a set of [conventions](http://spacevim.org/conventions/).
-- **Neovim centric:** Dark powered mode of SpaceVim
+- **Consistent experience:** consistent experience between Vim and NeoVim
 
 ## Screenshots
 
@@ -151,8 +151,6 @@ Neovim on iTerm2 using the SpaceVim color scheme _base16-solarized-dark_
 Depicts a common frontend development scenario with JavaScript (jQuery), SASS, and PHP buffers.
 
 Non-code buffers show a Neovim terminal, a TagBar window, a Vimfiler window and a TernJS definition window.
-
-To get more screenshots, see: [issue #415](https://github.com/SpaceVim/SpaceVim/issues/415)
 
 ## Concepts
 
@@ -258,6 +256,8 @@ SpaceVim also supports project specific configuration files.
 The init file is `.SpaceVim.d/init.toml` in the root of your project.
 The local `.SpaceVim.d/` will also be added to the `&runtimepath`.
 
+Please be aware that if there are errors in your `init.toml`, the setting will not be applied. See [FAQ](../faq/#why-are-the-options-in-toml-file-not-applied).
+
 All SpaceVim options can be found in `:h SpaceVim-options`,
 the key is the same as the option name without the `g:spacevim_` prefix.
 
@@ -314,7 +314,8 @@ For adding multiple custom plugins:
 **disable existing plugins**
 
 If you want to disable plugins which are added by SpaceVim,
-you can use SpaceVim `disabled_plugins` options:
+you can use SpaceVim `disabled_plugins` in the `[options]` section of your configuration file.
+options:
 
 ```toml
 [options]
@@ -328,8 +329,7 @@ SpaceVim provides two kinds of bootstrap functions
 for custom configurations and key bindings,
 namely `bootstrap_before` and `bootstrap_after`.
 
-To enable them you need to add the following into
-`~/.SpaceVim.d/init.toml`.
+To enable them you need to add the following into lines to the `[options]` section of your configuration file.
 
 ```toml
 [options]
@@ -409,7 +409,7 @@ The different key bindings between SpaceVim and vim are shown as below.
   ```
 
 - In vim the `,` key repeats the last last `f`, `F`, `t` and `T`, but in SpaceVim it is the language specific Leader key.
-  To disable this feature, set the option `enable_language_specific_leader` to `false`.
+  To disable this feature, set the option `enable_language_specific_leader` to `false` in in the `[options]` section of your configuration file.
 
   ```toml
   [options]
@@ -438,10 +438,11 @@ The different key bindings between SpaceVim and vim are shown as below.
 - In SpaceVim the `Ctrl-f` binding on the command line is mapped to `<Right>`, which will move cursor to the right.
 
 SpaceVim provides a vimcompatible mode, in vimcompatible mode, all the differences above will disappear.
-You can enable the vimcompatible mode by adding `vimcompatible = true` to the `[options]` section.
+You can enable the vimcompatible mode by adding `vimcompatible = true` to the `[options]` section of your configuration file.
 
 If you want to disable any differences above, use the relevant options.
-For example, in order to disable language specific leader, you may add the following lines to your configuration file:
+For example, in order to disable language specific leader, you may add the following lines to the `[options]` section of
+`~/.SpaceVim.d/init.toml`:
 
 ```toml
 [options]
@@ -515,7 +516,7 @@ There are two variants of this colorscheme, dark and light. Some aspects
 of these colorschemes can be customized in the custom configuration file, read `:h gruvbox`.
 
 It is possible to change the colorscheme in `~/.SpaceVim.d/init.toml` with
-the variable `colorscheme`. For instance, to specify `desert`:
+the variable `colorscheme`. For instance, to specify `desert` add the following to the `[options]` section:
 
 ```toml
 [options]
@@ -554,6 +555,23 @@ guifont = "SourceCodePro Nerd Font Mono:h11"
 If the specified font is not found, the fallback one will be used (depends on your system).
 Also note that changing this value has no effect if you are running Vim/Neovim in terminal.
 
+**Increase/Decrease fonts**
+
+| Key Bindings | Descriptions              |
+| ------------ | ------------------------- |
+| `SPC z .`    | open font transient state |
+
+![font transient state](https://user-images.githubusercontent.com/13142418/170854166-bbcd5448-47d3-4fb5-ab7a-97540140d975.png)
+
+In font transient state:
+
+| Key Bindings  | Descriptions              |
+| ------------- | ------------------------- |
+| `+`           | increase the font size    |
+| `-`           | decrease the font size    |
+| Any other key | leave the transient state |
+
+
 ### Mouse
 
 Mouse support is enabled in Normal mode and Visual mode by default.
@@ -568,6 +586,17 @@ endfunction
 ```
 
 Read `:h 'mouse'` for more info.
+
+### Scrollbar
+
+The scrollbar is disabled by default. To enable the scrollbar,
+you need to change `enable_scrollbar` option in [ui layer](../layers/ui/).
+
+```
+[[layers]]
+  name = "ui"
+  enable_scrollbar = true
+```
 
 ### UI Toggles
 
@@ -678,7 +707,7 @@ All the colors are based on the current colorscheme.
 
 **Statusline separators:**
 
-It is possible to easily customize the statusline separator by setting the `statusline_separator` variable in your custom configuration file and then redraw the statusline. For instance, if you want to set the separator back to the well-known arrow separator, add the following snippet to your configuration file:
+It is possible to easily customize the statusline separator by setting the `statusline_separator` variable in your custom configuration file and then redraw the statusline. For instance, if you want to set the separator back to the well-known arrow separator, add the following snippet to the `[options]` section of your configuration file:
 
 ```toml
 [options]
@@ -710,6 +739,7 @@ The letters displayed in the statusline correspond to the key bindings used to t
 | `SPC t s`    | ⓢ       | s     | syntax checking (neomake)                       |
 | `SPC t S`    | Ⓢ       | S     | enabled in spell checking                       |
 | `SPC t w`    | ⓦ       | w     | whitespace mode (highlight trailing whitespace) |
+| `SPC t W`    | Ⓦ       | W     | wrap line mode                                  |
 
 **colorscheme of statusline:**
 
@@ -755,7 +785,7 @@ endfunction
 
 This example is the gruvbox colorscheme, if you want to use same colors when
 switching between different colorschemes, you may need to set
-`custom_color_palette` in your custom configuration file. For example:
+`custom_color_palette` in the `[options]` section of your custom configuration file. For example:
 
 ```toml
 [options]
@@ -845,7 +875,7 @@ Key bindings within the tab manager window:
 SpaceVim uses `nerdtree` as the default file tree, the default key binding is `<F3>`.
 SpaceVim also provides `SPC f t` and `SPC f T` to open the file tree.
 
-To change the filemanager plugin:
+To change the filemanager plugin insert the following to the `[options]` section of your configuration file.
 
 ```toml
 [options]
@@ -863,7 +893,7 @@ to your custom configuration file. Here is a picture of this feature:
 
 ![file-tree](https://user-images.githubusercontent.com/13142418/80496111-5065b380-899b-11ea-95c7-02af4d304aaf.png)
 
-There is also an option to configure show/hide the file tree, default to show. To hide the file tree by default, you can use the `enable_vimfiler_welcome` option:
+There is also an option to configure show/hide the file tree, default to show. To hide the file tree by default, you can use the `enable_vimfiler_welcome` in the `[options]` section:
 
 ```toml
 [options]
@@ -923,6 +953,25 @@ If only one file buffer is opened, a file is opened in the active window, otherw
 | `l` / `<Enter>` | open file in one window                  |
 | `s g`           | open file in a vertically split window   |
 | `s v`           | open file in a horizontally split window |
+
+
+#### Override filetree key bindings
+
+If you want to override the default key bindings in filetree windows. You can use User autocmd in bootstrap function. for examples:
+
+```vim
+function! myspacevim#before() abort
+    autocmd User NerdTreeInit
+        \ nnoremap <silent><buffer> <CR> :<C-u>call
+        \ g:NERDTreeKeyMap.Invoke('o')<CR>
+endfunction
+```
+
+Here is all the autocmd for filetree:
+
+- nerdtree: `User NerdTreeInit`
+- defx: `User DefxInit`
+- vimfiler: `User VimfilerInit`
 
 ## General usage
 
@@ -1058,7 +1107,7 @@ Then use `<Tab>` or `<Up>` and `<Down>` to select the mapping, press `<Enter>` t
 #### Code indentation
 
 The default indentation of code is 2, which is controlled by the option `default_indent`.
-If you prefer to use 4 as code indentation. Just add the following snippet to SpaceVim's
+If you prefer to use 4 as code indentation. Just add the following snippet to the `[options]` section in the SpaceVim's
 configuration file:
 
 ```toml
@@ -1068,7 +1117,7 @@ configuration file:
 
 The `default_indent` option will be applied to vim's `&tabstop`, `&softtabstop` and
 `&shiftwidth` options. By default, when the user inserts a `<Tab>`, it will be expanded
-to spaces. This feature can be disabled by `expand_tab` option.
+to spaces. This feature can be disabled by `expand_tab` option the `[options]` section:
 
 ```toml
 [options]
@@ -1294,7 +1343,7 @@ write
 ### Window manager
 
 Window manager key bindings can only be used in normal mode. The default leader `[WIN]` is `s`, you
-can change it via `windows_leader` option:
+can change it via `windows_leader` in the `[options]` section:
 
 ```toml
 [options]
@@ -1346,45 +1395,45 @@ Every window has a number displayed at the start of the statusline and can be qu
 
 Windows manipulation commands (start with `w`):
 
-| Key Bindings          | Descriptions                                                                                                  |
-| --------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `SPC w .`             | windows transient state                                                                                       |
-| `SPC w <Tab>`         | switch to alternate window in the current frame (switch back and forth)                                       |
-| `SPC w =`             | balance split windows                                                                                         |
-| `SPC w b`             | force the focus back to the minibuffer (TODO)                                                                 |
-| `SPC w c`             | Distraction-free reading current window (tools layer)                                                         |
-| `SPC w C`             | Distraction-free reading other windows via vim-choosewin (tools layer)                                        |
-| `SPC w d`             | delete a window                                                                                               |
-| `SPC u SPC w d`       | delete a window and its current buffer (does not delete the file) (TODO)                                      |
-| `SPC w D`             | delete another window using vim-choosewin                                                                     |
-| `SPC u SPC w D`       | delete another window and its current buffer using vim-choosewin (TODO)                                       |
-| `SPC w t`             | toggle window dedication (dedicated window cannot be reused by a mode) (TODO)                                 |
-| `SPC w f`             | toggle follow mode                                                                                            |
-| `SPC w F`             | create new tab                                                                                                |
-| `SPC w h`             | move to window on the left                                                                                    |
-| `SPC w H`             | move window to the left                                                                                       |
-| `SPC w j`             | move to window below                                                                                          |
-| `SPC w J`             | move window to the bottom                                                                                     |
-| `SPC w k`             | move to window above                                                                                          |
-| `SPC w K`             | move window to the top                                                                                        |
-| `SPC w l`             | move to window on the right                                                                                   |
-| `SPC w L`             | move window to the right                                                                                      |
-| `SPC w m`             | maximize/minimize a window (maximize is equivalent to delete other windows) (TODO, now only support maximize) |
-| `SPC w M`             | swap windows using vim-choosewin                                                                              |
-| `SPC w o`             | cycle and focus between tabs                                                                                  |
-| `SPC w p m`           | open messages buffer in a popup window (TODO)                                                                 |
-| `SPC w p p`           | close the current sticky popup window (TODO)                                                                  |
-| `SPC w r`             | rotate windows forward                                                                                        |
-| `SPC w R`             | rotate windows backward                                                                                       |
-| `SPC w s` / `SPC w -` | horizontal split                                                                                              |
-| `SPC w S`             | horizontal split and focus new window                                                                         |
-| `SPC w u`             | undo window layout                                                                                            |
-| `SPC w U`             | redo window layout                                                                                            |
-| `SPC w v` / `SPC w /` | vertical split                                                                                                |
-| `SPC w V`             | vertical split and focus new window                                                                           |
-| `SPC w w`             | cycle and focus between windows                                                                               |
-| `SPC w W`             | select window using vim-choosewin                                                                             |
-| `SPC w x`             | exchange current window with next one                                                                         |
+| Key Bindings          | Descriptions                                                                  |
+| --------------------- | ----------------------------------------------------------------------------- |
+| `SPC w .`             | windows transient state                                                       |
+| `SPC w <Tab>`         | switch to alternate window in the current frame (switch back and forth)       |
+| `SPC w =`             | balance split windows                                                         |
+| `SPC w b`             | force the focus back to the minibuffer (TODO)                                 |
+| `SPC w c`             | Distraction-free reading current window (tools layer)                         |
+| `SPC w C`             | Distraction-free reading other windows via vim-choosewin (tools layer)        |
+| `SPC w d`             | delete a window                                                               |
+| `SPC u SPC w d`       | delete a window and its current buffer (does not delete the file) (TODO)      |
+| `SPC w D`             | delete another window using vim-choosewin                                     |
+| `SPC u SPC w D`       | delete another window and its current buffer using vim-choosewin (TODO)       |
+| `SPC w t`             | toggle window dedication (dedicated window cannot be reused by a mode) (TODO) |
+| `SPC w f`             | toggle follow mode                                                            |
+| `SPC w F`             | create new tab                                                                |
+| `SPC w h`             | move to window on the left                                                    |
+| `SPC w H`             | move window to the left                                                       |
+| `SPC w j`             | move to window below                                                          |
+| `SPC w J`             | move window to the bottom                                                     |
+| `SPC w k`             | move to window above                                                          |
+| `SPC w K`             | move window to the top                                                        |
+| `SPC w l`             | move to window on the right                                                   |
+| `SPC w L`             | move window to the right                                                      |
+| `SPC w m`             | maximize/minimize a window                                                    |
+| `SPC w M`             | swap windows using vim-choosewin                                              |
+| `SPC w o`             | cycle and focus between tabs                                                  |
+| `SPC w p m`           | open messages buffer in a popup window (TODO)                                 |
+| `SPC w p p`           | close the current sticky popup window (TODO)                                  |
+| `SPC w r`             | rotate windows forward                                                        |
+| `SPC w R`             | rotate windows backward                                                       |
+| `SPC w s` / `SPC w -` | horizontal split                                                              |
+| `SPC w S`             | horizontal split and focus new window                                         |
+| `SPC w u`             | undo window layout                                                            |
+| `SPC w U`             | redo window layout                                                            |
+| `SPC w v` / `SPC w /` | vertical split                                                                |
+| `SPC w V`             | vertical split and focus new window                                           |
+| `SPC w w`             | cycle and focus between windows                                               |
+| `SPC w W`             | select window using vim-choosewin                                             |
+| `SPC w x`             | exchange current window with next one                                         |
 
 ### Buffers and Files
 
@@ -1469,7 +1518,7 @@ By default, `find` is the default tool, you can use `ctrl-e` to switch tools.
 
 ![find](https://user-images.githubusercontent.com/13142418/97999590-79717000-1e26-11eb-91b1-458ab30d6254.gif)
 
-To change the default file searching tool, you can use `file_searching_tools` option.
+To change the default file searching tool, you can use `file_searching_tools` in the `[options]` section.
 It is `[]` by default.
 
 ```toml
@@ -1483,10 +1532,11 @@ The first item is the name of the tool, the second one is the default searching 
 
 Convenient key bindings are located under the prefix `SPC f v` to quickly navigate between Vim and SpaceVim specific files.
 
-| Key Bindings | Descriptions                            |
-| ------------ | --------------------------------------- |
-| `SPC f v v`  | display and copy SpaceVim version       |
-| `SPC f v d`  | open SpaceVim custom configuration file |
+| Key Bindings | Descriptions                                     |
+| ------------ | ------------------------------------------------ |
+| `SPC f v v`  | display and copy SpaceVim version                |
+| `SPC f v d`  | open SpaceVim custom configuration file          |
+| `SPC f v s`  | list all loaded vim scripts, like `:scriptnames` |
 
 ### Available layers
 
@@ -1502,8 +1552,14 @@ Fuzzy finder provides a variety of efficient content searching key bindings,
 including file searching, outline searching, vim messages searching and register
 content searching.
 
-SpaceVim provides five fuzzy find tools, each of them is configured in a layer
-([`unite`](../layers/unite/), `denite`, `leaderf`, `ctrlp` and `fzf` layer).
+Currently, there are six fuzzy finder layers:
+
+- [`unite`](../layers/unite/) layer: based on `Shougo/unite.vim`
+- [`denite`](../layers/denite/) layer: based on `Shougo/denite.nvim`
+- [`leaderf`](../layers/leaderf/) layer: based on `Yggdroot/LeaderF`
+- [`ctrlp`](../layers/ctrlp/) layer: based on `ctrlpvim/ctrlp.vim`
+- [`fzf`](../layers/fzf/) layer: based on fzf
+- [`telescope`](../layers/telescope) layer: based on telescope.nvim
 
 These layers have the same key bindings and features. But they need different dependencies.
 
@@ -1915,7 +1971,7 @@ which contains short descriptions of all the mappings starting with `z`.
 
 When you open a file, SpaceVim will change the current directory to the root
 directory of the project that contains this file. The project's root directory detection
-is based on the `project_rooter_patterns` option, and the default value is:
+is based on the `project_rooter_patterns` in the `[options]` section, and the default value is:
 
 ```toml
 [options]
@@ -1954,6 +2010,10 @@ Project manager commands start with `p`:
 | Key Bindings | Descriptions                                          |
 | ------------ | ----------------------------------------------------- |
 | `SPC p '`    | open a shell in project’s root (need the shell layer) |
+
+#### Show project info on cmdline
+
+By default the key binding `Ctrl-g` will display the information of current project on command line.
 
 #### Searching files in project
 
@@ -2226,9 +2286,16 @@ With the above configuration, you will see the following tasks in the SpaceVim r
 ### Todo manager
 
 The todo manager plugin will run `rg` asynchronously, the results will be displayed on todo manager windows.
-The key binding is `SPC a o`.
+The key binding is `SPC a o`. The default `todo_prefix` option is `@`,
+and the `todo_labels` is: `['fixme', 'question', 'todo', 'idea']`.
 
-The default tags is: `'@fixme', '@question', '@todo', '@idea'`.
+Example:
+
+```
+[options]
+   todo_labels = ['fixme', 'question', 'todo', 'idea']
+   todo_prefix = '@'
+```
 
 ![todo manager](https://user-images.githubusercontent.com/13142418/61462920-0bd9d000-a9a6-11e9-8e1f-c70d6ec6ca1e.png)
 
@@ -2244,38 +2311,45 @@ The default color for iedit is `red`/`green` which is based on the current color
 
 **State transitions:**
 
-| Key Bindings | From             | to           |
-| ------------ | ---------------- | ------------ |
-| `SPC s e`    | normal or visual | iedit-Normal |
+| Key Bindings | Description                         |
+| ------------ | ----------------------------------- |
+| `SPC s e`    | start iedit with all matchs         |
+| `SPC s E`    | start iedit with only current match |
 
 **In iedit-Normal mode:**
 
 `iedit-Normal` mode inherits from `Normal` mode, the following key bindings are specific to `iedit-Normal` mode.
 
-| Key Binding   | Descriptions                                                                                                                       |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `<Esc>`       | go back to `Normal` mode                                                                                                           |
-| `i`           | switch to `iedit-Insert` mode, same as `i` in `Normal` model                                                                       |
-| `a`           | switch to `iedit-Insert` mode, same as `a` in `Normal` model                                                                       |
-| `I`           | go to the beginning of the current occurrence and switch to `iedit-Insert` mode, same as `I` in `Normal` model                     |
-| `A`           | go to the end of the current occurrence and switch to `iedit-Insert` mode, same as `A` in `Normal` model                           |
-| `<Left>`/`h`  | Move cursor to left, same as `h` in `Normal` model                                                                                 |
-| `<Right>`/`l` | Move cursor to right, same as `l` in `Normal` model                                                                                |
-| `0`/`<Home>`  | go to the beginning of the current occurrence, same as `0` in `Normal` model                                                       |
-| `$`/`<End>`   | go to the end of the current occurrence, same as `$` in `Normal` model                                                             |
-| `C`           | delete the characters from the cursor to the end in all occurrences and switch to iedit-Insert mode, same as `C` in `Normal` model |
-| `D`           | delete the occurrences, same as `D` in `Normal` model                                                                              |
-| `s`           | delete the character under cursor and switch to iedit-Insert mode, same as `s` in `Normal` model                                   |
-| `S`           | delete the occurrences and switch to iedit-Insert mode, same as `S` in `Normal` model                                              |
-| `x`           | delete the character under cursor in all the occurrences, same as `x` in `Normal` model                                            |
-| `X`           | delete the character before cursor in all the occurrences, same as `X` in `Normal` model                                           |
-| `gg`          | go to first occurrence, same as `gg` in `Normal` model                                                                             |
-| `G`           | go to last occurrence, same as `G` in `Normal` model                                                                               |
-| `f{char}`     | Move the cursor to the right where the `{char}` first appears in all the occurrences                                               |
-| `n`           | go to next occurrence                                                                                                              |
-| `N`           | go to previous occurrence                                                                                                          |
-| `p`           | replace occurrences with last yanked (copied) text                                                                                 |
-| `<Tab>`       | toggle current occurrence                                                                                                          |
+| Key Binding   | Descriptions                                                             |
+| ------------- | ------------------------------------------------------------------------ |
+| `<Esc>`       | go back to `Normal` mode                                                 |
+| `i`           | start `iedit-Insert` mode after current character                        |
+| `a`           | start `iedit-Insert` mode before current character                       |
+| `I`           | goto the beginning and start `iedit-Insert` mode                         |
+| `A`           | goto the end and start `iedit-Insert` mode                               |
+| `<Left>`/`h`  | Move cursor to left                                                      |
+| `<Right>`/`l` | Move cursor to right                                                     |
+| `0`/`<Home>`  | go to the beginning of the current occurrence                            |
+| `$`/`<End>`   | go to the end of the current occurrence                                  |
+| `C`           | delete from the cursor position to the end and start `iedit-Insert` mode |
+| `D`           | delete the occurrences                                                   |
+| `s`           | delete the character under cursor and start iedit-Insert mode            |
+| `S`           | delete the occurrences and start iedit-Insert mode                       |
+| `x`           | delete the character under cursor in all the occurrences                 |
+| `X`           | delete the character before cursor in all the occurrences                |
+| `gg`          | go to first occurrence                                                   |
+| `G`           | go to last occurrence                                                    |
+| `f{char}`     | To first occurrence of `{char}` to the right.                            |
+| `n`           | go to next occurrence                                                    |
+| `N`           | go to previous occurrence                                                |
+| `p`           | replace occurrences with last yanked (copied) text                       |
+| `<Tab>`       | toggle current occurrence                                                |
+| `Ctrl-n`      | forward and active next match                                            |
+| `Ctrl-x`      | inactivate current match and move forward                                |
+| `Ctrl-p`      | inactivate current match and move backward                               |
+| `e`           | forward to the end of word                                               |
+| `w`           | forward to the begin of next word                                        |
+| `b`           | move to the begin of current word                                        |
 
 **In iedit-Insert mode:**
 
@@ -2292,7 +2366,7 @@ The default color for iedit is `red`/`green` which is based on the current color
 | `Ctrl-h` / `<Backspace>` | delete character before cursor                              |
 | `<Delete>`               | delete character after cursor                               |
 
-### Code runner and REPL
+### Code runner
 
 SpaceVim provides an asynchronous code runner plugin. In most language layers,
 the key binding `SPC l r` is defined for running the current buffer.
@@ -2303,17 +2377,18 @@ Use `F5` to build the project asynchronously.
 nnoremap <silent> <F5> :call SpaceVim#plugins#runner#open('make')
 ```
 
-The following features have been added to the runner and repl plugins:
+Key bindings within code runner buffer:
 
-- Run the current file with the default command
-- Run code file through system file explorer, only supported in gvim.
-- Run code per Shebang
-- Stop code running
-- View output in the Output Window
-- Set default language to run
-- Select language to run
-- REPL support
-- Run selected code snippet
+| key binding | description                 |
+| ----------- | --------------------------- |
+| `ctrl-c`    | stop code runner            |
+| `i`         | open promote to insert text |
+
+### Read Eval Print Loop
+
+The REPL(Read Eval Print Loop) plugin provides a framework to run REPL command asynchronously.
+
+For different language, you need to checkout the doc of language layer. The repl key bindings are defined in language layer.
 
 ### Highlight current symbol
 
@@ -2409,37 +2484,5 @@ export PATH=$PATH:$HOME/.SpaceVim/bin
 Use `svc` to open a file in the existing Vim server, or use `nsvc` to open a file in the existing Neovim server.
 
 ![server-and-client](https://user-images.githubusercontent.com/13142418/32554968-7164fe9c-c4d6-11e7-95f7-f6a6ea75e05b.gif)
-
-<!-- SpaceVim Achievements start -->
-
-## Achievements
-
-### issues
-
-| Achievements                                                          | Account                                             |
-| --------------------------------------------------------------------- | --------------------------------------------------- |
-| [100th issue(issue)](https://github.com/SpaceVim/SpaceVim/issues/100) | [BenBergman](https://github.com/BenBergman)         |
-| [1000th issue(PR)](https://github.com/SpaceVim/SpaceVim/issues/1000)  | [sei40kr](https://github.com/sei40kr)               |
-| [2000th issue(PR)](https://github.com/SpaceVim/SpaceVim/issues/2000)  | [nikolaussucher](https://github.com/nikolaussucher) |
-| [3000th issue(PR)](https://github.com/SpaceVim/SpaceVim/issues/3000)  | [nahuef](https://github.com/nahuef)                 |
-
-### Stars, forks and watchers
-
-| Achievements       | Account                                             |
-| ------------------ | --------------------------------------------------- |
-| First stargazers   | [monkeydterry](https://github.com/monkeydterry)     |
-| 100th stargazers   | [robertofarrell](https://github.com/robertofarrell) |
-| 1000th stargazers  | [mohebifar](https://github.com/mohebifar)           |
-| 2000th stargazers  | [myakove](https://github.com/myakove)               |
-| 3000th stargazers  | [adrian-spataru](https://github.com/adrian-spataru) |
-| 4000th stargazers  | [seungdols](https://github.com/seungdols)           |
-| 5000th stargazers  | [shiningdracon](https://github.com/shiningdracon)   |
-| 6000th stargazers  | [SummerMagic](https://github.com/SummerMagic)       |
-| 7000th stargazers  | [Murderlon](https://github.com/Murderlon)           |
-| 8000th stargazers  | [dbdr](https://github.com/dbdr)                     |
-| 9000th stargazers  | [Ruyka](https://github.com/Ruyka)                   |
-| 10000th stargazers | [royge](https://github.com/royge)                   |
-
-<!-- SpaceVim Achievements end -->
 
 <!-- vim:set nowrap: -->

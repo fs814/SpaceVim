@@ -20,6 +20,7 @@ scriptencoding utf-8
 "   enabled by default.
 " - `enable_filetree_gitstatus`: enable/disable git status column in filetree.
 " - `enable_filetree_filetypeicon`: enable/disable filetype icons in filetree.
+" - `enable_netrw`: enable/disable netrw, disabled by default.
 "
 " NOTE: the `enable_vimfiler_gitstatus` and `enable_filetree_gitstatus` option
 " has been deprecated. Use layer option instead.
@@ -34,13 +35,11 @@ if exists('s:string_hi')
 endif
 
 let s:enable_smooth_scrolling = 1
+let s:enable_netrw = 0
 
 let g:_spacevim_enable_filetree_gitstatus = 0
 let g:_spacevim_enable_filetree_filetypeicon = 0
 
-
-" disabel netrw
-let g:loaded_netrwPlugin = 1
 
 
 let s:SYS = SpaceVim#api#import('system')
@@ -57,7 +56,10 @@ function! SpaceVim#layers#core#plugins() abort
     call add(plugins, [g:_spacevim_root_dir . 'bundle/nvim-yarp',  {'merged': 0}])
     call add(plugins, [g:_spacevim_root_dir . 'bundle/vim-hug-neovim-rpc',  {'merged': 0}])
   endif
-  call add(plugins, [g:_spacevim_root_dir . 'bundle/vim-smoothie',  {'merged': 0}])
+  if has('timers') && has('float')
+    " vim-smoothie needs +timers and +float
+    call add(plugins, [g:_spacevim_root_dir . 'bundle/vim-smoothie',  {'merged': 0}])
+  endif
   if g:spacevim_filemanager ==# 'nerdtree'
     call add(plugins, [g:_spacevim_root_dir . 'bundle/nerdtree', { 'merged' : 0,
           \ 'loadconf' : 1}])
@@ -81,6 +83,9 @@ function! SpaceVim#layers#core#plugins() abort
     call add(plugins, [g:_spacevim_root_dir . 'bundle/defx.nvim',{'merged' : 0, 'loadconf' : 1 , 'loadconf_before' : 1}])
     call add(plugins, [g:_spacevim_root_dir . 'bundle/defx-git',{'merged' : 0, 'loadconf' : 1}])
     call add(plugins, [g:_spacevim_root_dir . 'bundle/defx-icons',{'merged' : 0}])
+    call add(plugins, [g:_spacevim_root_dir . 'bundle/defx-sftp',{'merged' : 0}])
+  elseif g:spacevim_filemanager ==# 'nvim-tree'
+    call add(plugins, [g:_spacevim_root_dir . 'bundle/nvim-tree.lua',{'merged' : 0, 'loadconf' : 1}])
   endif
 
   if !g:spacevim_vimcompatible
@@ -92,6 +97,8 @@ function! SpaceVim#layers#core#plugins() abort
     call add(plugins, [g:_spacevim_root_dir . 'bundle/vim-matchup', {'merged' : 0}])
   endif
   call add(plugins, [g:_spacevim_root_dir . 'bundle/gruvbox', {'loadconf' : 1, 'merged' : 0}])
+  call add(plugins, [g:_spacevim_root_dir . 'bundle/vim-clipboard', {'merged' : 0}])
+  call add(plugins, [g:_spacevim_root_dir . 'bundle/nvim-if-lua-compat', {'merged' : 0}])
   call add(plugins, [g:_spacevim_root_dir . 'bundle/open-browser.vim', {
         \ 'merged' : 0, 'loadconf' : 1,
         \}])
@@ -103,6 +110,13 @@ endfunction
 let s:filename = expand('<sfile>:~')
 let s:lnum = expand('<slnum>') + 2
 function! SpaceVim#layers#core#config() abort
+
+  if !s:enable_netrw
+    " disabel netrw
+    let g:loaded_netrwPlugin = 1
+  endif
+
+
   if g:spacevim_filemanager ==# 'nerdtree'
     noremap <silent> <F3> :NERDTreeToggle<CR>
   endif
@@ -178,19 +192,6 @@ function! SpaceVim#layers#core#config() abort
         \ . string(s:_function('s:explore_current_dir')) . ', [1])',
         \ 'split-explore-current-directory', 1)
 
-  " call SpaceVim#mapping#space#def('nmap', ['j', 'j'], '<Plug>(easymotion-overwin-f)', 'jump to a character', 0)
-  call SpaceVim#mapping#space#def('nmap', ['j', 'j'], '<Plug>(better-easymotion-overwin-f)', 'jump-or-select-to-a-character', 0, 1)
-  nnoremap <silent> <Plug>(better-easymotion-overwin-f) :call <SID>better_easymotion_overwin_f(0)<Cr>
-  xnoremap <silent> <Plug>(better-easymotion-overwin-f) :<C-U>call <SID>better_easymotion_overwin_f(1)<Cr>
-  call SpaceVim#mapping#space#def('nmap', ['j', 'J'], '<Plug>(easymotion-overwin-f2)', 'jump-to-suite-of-two-characters', 0)
-  call SpaceVim#mapping#space#def('nnoremap', ['j', 'k'], 'j==', 'goto-next-line-and-indent', 0)
-  " call SpaceVim#mapping#space#def('nmap', ['j', 'l'], '<Plug>(easymotion-overwin-line)', 'jump to a line', 0)
-  call SpaceVim#mapping#space#def('nmap', ['j', 'l'], '<Plug>(better-easymotion-overwin-line)', 'jump-or-select-to-a-line', 0, 1)
-  nnoremap <silent> <Plug>(better-easymotion-overwin-line) :call <SID>better_easymotion_overwin_line(0)<Cr>
-  xnoremap <silent> <Plug>(better-easymotion-overwin-line) :<C-U>call <SID>better_easymotion_overwin_line(1)<Cr>
-  call SpaceVim#mapping#space#def('nmap', ['j', 'v'], '<Plug>(easymotion-overwin-line)', 'jump-to-a-line', 0)
-  call SpaceVim#mapping#space#def('nmap', ['j', 'w'], '<Plug>(easymotion-overwin-w)', 'jump-to-a-word', 0)
-  call SpaceVim#mapping#space#def('nmap', ['j', 'q'], '<Plug>(easymotion-overwin-line)', 'jump-to-a-line', 0)
   call SpaceVim#mapping#space#def('nnoremap', ['j', 'n'], "i\<cr>\<esc>", 'sp-newline', 0)
   call SpaceVim#mapping#space#def('nnoremap', ['j', 'c'], 'call call('
         \ . string(s:_function('s:jump_last_change')) . ', [])',
@@ -210,9 +211,6 @@ function! SpaceVim#layers#core#config() abort
   call SpaceVim#mapping#space#def('nnoremap', ['w', 'R'], 'call call('
         \ . string(s:_function('s:previous_window')) . ', [])',
         \ 'rotate-windows-backward', 1)
-  call SpaceVim#mapping#space#def('nnoremap', ['j', 'u'], 'call call('
-        \ . string(s:_function('s:jump_to_url')) . ', [])',
-        \ 'jump-to-url', 1)
   call SpaceVim#mapping#def('nnoremap <silent>', '<S-Tab>', ':wincmd p<CR>', 'Switch to previous window or tab','wincmd p')
   call SpaceVim#mapping#space#def('nnoremap', ['<Tab>'], 'try | b# | catch | endtry', 'last-buffer', 1)
   let lnum = expand('<slnum>') + s:lnum - 1
@@ -319,6 +317,11 @@ function! SpaceVim#layers#core#config() abort
     call SpaceVim#mapping#space#def('nnoremap', ['f', 'T'], 'Defx -no-toggle', 'show-file-tree', 1)
     call SpaceVim#mapping#space#def('nnoremap', ['f', 'o'], "Defx  -no-toggle -search=`expand('%:p')` `stridx(expand('%:p'), getcwd()) < 0? expand('%:p:h'): getcwd()`", 'open-file-tree', 1)
     call SpaceVim#mapping#space#def('nnoremap', ['b', 't'], 'exe "Defx -no-toggle " . fnameescape(expand("%:p:h"))', 'show-file-tree-at-buffer-dir', 1)
+  elseif g:spacevim_filemanager ==# 'nvim-tree'
+    call SpaceVim#mapping#space#def('nnoremap', ['f', 't'], 'NvimTreeToggle', 'toggle-file-tree', 1)
+    call SpaceVim#mapping#space#def('nnoremap', ['f', 'T'], 'NvimTree', 'show-file-tree', 1)
+    call SpaceVim#mapping#space#def('nnoremap', ['f', 'o'], "NvimTreeFindFile", 'open-file-tree', 1)
+    call SpaceVim#mapping#space#def('nnoremap', ['b', 't'], 'exe "NvimTreeOpen " . fnameescape(expand("%:p:h"))', 'show-file-tree-at-buffer-dir', 1)
   endif
   call SpaceVim#mapping#space#def('nnoremap', ['f', 'y'], 'call SpaceVim#util#CopyToClipboard()', 'show-and-copy-buffer-filename', 1)
   nnoremap <silent> <Plug>YankGitRemoteURL :call SpaceVim#util#CopyToClipboard(2)<Cr>
@@ -363,7 +366,16 @@ function! SpaceVim#layers#core#config() abort
   let g:vimproc#download_windows_dll = 1
   " call SpaceVim#mapping#space#def('nnoremap', ['p', 't'], 'call SpaceVim#plugins#projectmanager#current_root()', 'find-project-root', 1)
   let g:_spacevim_mappings_space.p.t = {'name' : '+Tasks'}
-  call SpaceVim#mapping#space#def('nnoremap', ['p', 't', 'e'], 'call SpaceVim#plugins#tasks#edit()', 'edit-project-task', 1)
+  let lnum = expand('<slnum>') + s:lnum - 1
+  call SpaceVim#mapping#space#def('nnoremap', ['p', 't', 'e'],
+        \ 'call SpaceVim#plugins#tasks#edit()',
+        \ ['edit-project-task',
+        \ ['[SPC p t e] is to edit the task configuration file of current project,',
+        \ 'the default task file is `.SpaceVim.d/tasks.toml`',
+        \ '',
+        \ 'Definition: ' . s:filename . ':' . lnum]
+        \ ]
+        \ , 1)
   call SpaceVim#mapping#space#def('nnoremap', ['p', 't', 'l'], 'call SpaceVim#plugins#tasks#list()', 'list-tasks', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['p', 't', 'c'], 'call SpaceVim#plugins#runner#clear_tasks()', 'clear-tasks', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['p', 't', 'r'],
@@ -600,11 +612,6 @@ else
   endfunction
 endif
 
-function! s:jump_to_url() abort
-  let g:EasyMotion_re_anywhere = 'http[s]*://'
-  call feedkeys("\<Plug>(easymotion-jumptoanywhere)")
-endfunction
-
 function! s:safe_erase_buffer() abort
   if s:MESSAGE.confirm('Erase content of buffer ' . expand('%:t'))
     normal! ggdG
@@ -622,10 +629,11 @@ function! s:ToggleWinDiskManager() abort
 endfunction
 
 function! s:open_message_buffer() abort
-  vertical topleft edit __Message_Buffer__
+  edit __Message_Buffer__
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nospell nonumber norelativenumber
   setf SpaceVimMessageBuffer
-  normal! ggdG
+  setlocal modifiable
+  noautocmd normal! gg"_dG
   silent put=s:CMP.execute(':message')
   normal! G
   setlocal nomodifiable
@@ -846,50 +854,6 @@ function! s:comment_invert_yank(visual) range abort
   call feedkeys("\<Plug>NERDCommenterInvert")
 endfunction
 
-function! s:better_easymotion_overwin_line(is_visual) abort
-  let current_line = line('.')
-  try
-    if a:is_visual
-      call EasyMotion#Sol(0, 2)
-    else
-      call EasyMotion#overwin#line()
-    endif
-    " clear cmd line
-    noautocmd normal! :
-    if a:is_visual
-      let last_line = line('.')
-      exe current_line
-      if last_line > current_line
-        exe 'normal! V' . (last_line - current_line) . 'j'
-      else
-        exe 'normal! V' . (current_line - last_line) . 'k'
-      endif
-    endif
-  catch /^Vim\%((\a\+)\)\=:E117/
-
-  endtry
-endfunction
-
-function! s:better_easymotion_overwin_f(is_visual) abort
-  let [current_line, current_col] = getpos('.')[1:2]
-  try
-    call EasyMotion#OverwinF(1)
-    " clear cmd line
-    noautocmd normal! :
-    if a:is_visual
-      let last_line = line('.')
-      let [last_line, last_col] = getpos('.')[1:2]
-      call cursor(current_line, current_col)
-      if last_line > current_line        
-        exe 'normal! v' . (last_line - current_line) . 'j0' . last_col . '|'
-      else
-        exe 'normal! v' . (current_line - last_line) . 'k0' . last_col . '|' 
-      endif
-    endif
-  catch /^Vim\%((\a\+)\)\=:E117/
-
-  endtry
-endfunction
 
 function! s:comment_paragraphs(invert) abort
   if a:invert
@@ -1005,7 +969,7 @@ function! s:rename_current_file() abort
     echo 'canceled!'
   endif
 
-  
+
 endfunction
 
 function! s:save_as_new_file() abort
@@ -1088,6 +1052,9 @@ function! SpaceVim#layers#core#set_variable(var) abort
   let g:_spacevim_enable_filetree_gitstatus = get(a:var,
         \ 'enable_filetree_gitstatus',
         \ g:_spacevim_enable_filetree_gitstatus)
+  let s:enable_netrw = get(a:var,
+        \ 'enable_netrw',
+        \ 0)
 endfunction
 
 function! SpaceVim#layers#core#get_options() abort
@@ -1096,7 +1063,8 @@ function! SpaceVim#layers#core#get_options() abort
         \ 'filetree_closed_icon',
         \ 'filetree_opened_icon',
         \ 'filetree_show_hidden',
-        \ 'enable_smooth_scrolling'
+        \ 'enable_smooth_scrolling',
+        \ 'enable_filetree_filetypeicon'
         \ ]
 
 endfunction

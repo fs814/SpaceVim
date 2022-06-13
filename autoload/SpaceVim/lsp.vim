@@ -18,6 +18,7 @@ let s:box = SpaceVim#api#import('unicode#box')
 
 if (has('nvim-0.5.0') && s:NVIM_VERSION.is_release_version()) || has('nvim-0.6.0')
   " use neovim built-in lsp
+  call SpaceVim#logger#info('lsp client: nvim built-in lsp')
   function! SpaceVim#lsp#reg_server(ft, cmds) abort
     lua require("spacevim.lsp").register(
           \ require("spacevim").eval("a:ft"),
@@ -67,21 +68,24 @@ if (has('nvim-0.5.0') && s:NVIM_VERSION.is_release_version()) || has('nvim-0.6.0
     return v:lua.vim.lsp.buf.server_ready()
   endfunction
   function! SpaceVim#lsp#diagnostic_set_loclist() abort
-    lua vim.lsp.diagnostic.set_loclist()
+    lua require('spacevim.diagnostic').set_loclist()
   endfunction
   function! SpaceVim#lsp#diagnostic_goto_next() abort
-    lua vim.lsp.diagnostic.goto_next()
+    lua require("spacevim.diagnostic").goto_next()
   endfunction
   function! SpaceVim#lsp#diagnostic_goto_prev() abort
-    lua vim.lsp.diagnostic.goto_prev()
+    lua require("spacevim.diagnostic").goto_prev()
   endfunction
   function! SpaceVim#lsp#diagnostic_clear() abort
-    lua vim.lsp.diagnostic.clear(0)
+    lua require("spacevim.diagnostic").hide()
   endfunction
 elseif SpaceVim#layers#isLoaded('autocomplete') && get(g:, 'spacevim_autocomplete_method') ==# 'coc'
   " use coc.nvim
+  call SpaceVim#logger#info('lsp client: coc.nvim')
   let s:coc_language_servers = {}
   let s:coc_language_servers_key_id_map = {}
+  function! SpaceVim#lsp#buf_server_ready() abort
+  endfunction
   function! SpaceVim#lsp#reg_server(ft, cmds) abort
     " coc.nvim doesn't support key values containing dots
     " See https://github.com/neoclide/coc.nvim/issues/323
@@ -159,6 +163,9 @@ elseif SpaceVim#layers#isLoaded('autocomplete') && get(g:, 'spacevim_autocomplet
     call CocAction('jumpReferences')
   endfunction
 elseif has('nvim-0.4.3') && $ENABLE_NVIM043LSP
+  call SpaceVim#logger#info('lsp client: nvim-lspext')
+  function! SpaceVim#lsp#buf_server_ready() abort
+  endfunction
   function! SpaceVim#lsp#show_doc() abort
     lua require('lsp.plugin')
           \ .client.request('textDocument/hover',
@@ -199,6 +206,7 @@ elseif has('nvim-0.4.3') && $ENABLE_NVIM043LSP
   endfunction
 elseif has('nvim')
   " use LanguageClient-neovim
+  call SpaceVim#logger#info('lsp client: LanguageClient-neovim')
   function! SpaceVim#lsp#reg_server(ft, cmds) abort
     let g:LanguageClient_serverCommands[a:ft] = copy(a:cmds)
   endfunction
@@ -238,8 +246,11 @@ elseif has('nvim')
   function! SpaceVim#lsp#refactor() abort
     " @todo languageclient do not support refactor
   endfunction
+  function! SpaceVim#lsp#buf_server_ready() abort
+  endfunction
 else
   " use vim-lsp
+  call SpaceVim#logger#info('lsp client: vim-lsp')
   function! SpaceVim#lsp#reg_server(ft, cmds) abort
     exe 'au User lsp_setup call lsp#register_server({'
           \ . "'name': '" . a:ft . "-lsp',"

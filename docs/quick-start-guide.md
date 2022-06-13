@@ -11,6 +11,7 @@ configure, and use SpaceVim. It also lists a series of resources for learning Sp
 If you've never heard of SpaceVim, this is the best place to start.
 It will give you a good idea of what SpaceVim is like.
 
+
 <!-- vim-markdown-toc GFM -->
 
 - [Installation](#installation)
@@ -20,6 +21,7 @@ It will give you a good idea of what SpaceVim is like.
 - [Configuration](#configuration)
 - [Online tutorials](#online-tutorials)
 - [Learning SpaceVim](#learning-spacevim)
+- [User experiences](#user-experiences)
 
 <!-- vim-markdown-toc -->
 
@@ -62,11 +64,11 @@ If you got a vimproc error like this:
 ```
 
 Please read `:help vimproc` and make it, you may need to install make (from `build-essential`)
-and a C compiler (like `gcc`) to build the dll (see issue [#435](https://github.com/SpaceVim/SpaceVim/issues/435) and [#544](https://github.com/SpaceVim/SpaceVim/issues/544)).
+and a C compiler (like `gcc`) to build the dll.
 
 ### Windows
 
-The easiest way is to download [install.cmd](../install.cmd) and run it as administrator, or install SpaceVim manually.
+The easiest way is to download and run [install.cmd](../install.cmd) or install [SpaceVim manually](../faq/#how-to-install-spacevim-manually). The script installs or updates SpaceVim (if it exists) for Vim and Neovim.
 
 ## Run in docker
 
@@ -131,6 +133,8 @@ an example for basic usage of SpaceVim. For more info, please check out [documen
 If you want to use vim script to configure SpaceVim, please check out the
 [bootstrap function](../documentation/#bootstrap-functions) section.
 
+If there are errors in your `init.toml`, the setting will not be applied. See [FAQ](../faq/#why-are-the-options-in-toml-file-not-applied). There should be only one `[options]` section in `init.toml`.
+
 ## Online tutorials
 
 This is a list of online tutorials for using SpaceVim as a general IDE and programming language support:
@@ -153,3 +157,9 @@ A list of guides for programming language support:
   The SpaceVim Documentation will introduce you to the main topics important to using SpaceVim.
   The book is the primary official document of SpaceVim.
 - [Hack-SpaceVim](https://github.com/Gabirel/Hack-SpaceVim). Teaches you how to hack SpaceVim.
+
+## User experiences
+
+Here is a list of User experiences about using SpaceVim:
+
+- [Vim as an IDE, not the text editor](https://blog.ghaiklor.com/2019/10/12/vim-as-an-ide-not-the-text-editor/) - Eugene Obrezkov

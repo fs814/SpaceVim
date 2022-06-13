@@ -1,6 +1,6 @@
 "=============================================================================
 " main.vim --- Main file of SpaceVim
-" Copyright (c) 2016-2021 Shidong Wang & Contributors
+" Copyright (c) 2016-2022 Shidong Wang & Contributors
 " Author: Shidong Wang < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
@@ -34,6 +34,8 @@ call SpaceVim#logger#info('Loading SpaceVim from: ' . g:_spacevim_root_dir)
 
 if has('vim_starting')
   " python host
+  " @bug python2 error on neovim 0.6.1
+  " let g:loaded_python_provider = 0
   if !empty($PYTHON_HOST_PROG)
     let g:python_host_prog  = $PYTHON_HOST_PROG
     call SpaceVim#logger#info('$PYTHON_HOST_PROG is not empty, setting g:python_host_prog:' . g:python_host_prog)

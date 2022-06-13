@@ -13,25 +13,38 @@
 "
 " @subsection Mappings
 " >
-"   Mode      Key           Function
+"   Key           Function
 "   -------------------------------------------------------------
-"   normal    SPC g h i     show issues
-"   normal    SPC g h a     show activities
-"   normal    SPC g h d     show dashboard
-"   normal    SPC g h f     show current file in browser
-"   normal    SPC g h I     show issues in browser
-"   normal    SPC g h p     show PRs in browser
+"   SPC g h i     show issues
+"   SPC g h a     show activities
+"   SPC g h d     show dashboard
+"   SPC g h f     show current file in browser
+"   SPC g h I     show issues in browser
+"   SPC g h p     show PRs in browser
+" <
+"
+" NOTE: If you are using python2, you may get error:
+" >
+"    No module named past.builtins
+" <
+"
+" To fix this issue, you need to install `future` module.
+" >
+"   python2 -m pip install future
 " <
 
 function! SpaceVim#layers#github#plugins() abort
   return [
         \ [g:_spacevim_root_dir . 'bundle/github-issues.vim', {'merged' : 0}],
-        \ [g:_spacevim_root_dir . 'bundle/vim-github-dashboard', {'merged' : 0}],
+        \ [g:_spacevim_root_dir . 'bundle/vim-github-dashboard', {
+          \ 'merged' : 0,
+          \ 'if' : has('ruby'),
+          \ }],
         \ ['tyru/open-browser-github.vim',  {
         \ 'depends': 'open-browser.vim',
         \ 'on_cmd': ['OpenGithubFile', 'OpenGithubIssue', 'OpenGithubPullReq'],
         \ }],
-        \ ['wsdjeg/GitHub-api.vim', {'merged' : 0}],
+        \ [g:_spacevim_root_dir . 'bundle/github.vim', {'merged' : 0}],
         \ ['lambdalisue/vim-gista', {'merged' : 0}],
         \ ]
 endfunction
@@ -66,16 +79,16 @@ function! SpaceVim#layers#github#config() abort
         \ 'show issues', 1)
   "" }}}
 
-  "" junegunn/vim-github-dashboard {{{
-  let g:github_dashboard = {
-        \ 'username': g:spacevim_github_username,
-        \ }
-
-  call SpaceVim#mapping#space#def('nnoremap', ['g', 'h', 'a'], 'GHActivity',
-        \ 'show activities', 1)
-  call SpaceVim#mapping#space#def('nnoremap', ['g', 'h', 'd'], 'GHDashboard',
-        \ 'show dashboard', 1)
-  "" }}}
+  if has('ruby')
+    " vim-github-dashboard requires if_ruby
+    let g:github_dashboard = {
+          \ 'username': g:spacevim_github_username,
+          \ }
+    call SpaceVim#mapping#space#def('nnoremap', ['g', 'h', 'a'], 'GHActivity',
+          \ 'show activities', 1)
+    call SpaceVim#mapping#space#def('nnoremap', ['g', 'h', 'd'], 'GHDashboard',
+          \ 'show dashboard', 1)
+  endif
 
   "" tyru/open-browser-github.vim {{{
   call SpaceVim#mapping#space#def('nnoremap', ['g', 'h', 'f'], 'OpenGithubFile',
@@ -84,7 +97,7 @@ function! SpaceVim#layers#github#config() abort
         \ 'OpenGithubIssue', 'show issues in browser', 1)
   call SpaceVim#mapping#space#def('nnoremap', ['g', 'h', 'p'],
         \ 'OpenGithubPullReq', 'show PRs in browser', 1)
-  "" }}}
+  command! UpdateStartedRepos call s:update_stared_repo_list()
 endfunction
 
 function! SpaceVim#layers#github#health() abort

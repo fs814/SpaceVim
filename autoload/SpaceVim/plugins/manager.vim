@@ -231,7 +231,7 @@ function! s:on_pull_exit(id, data, event) abort
     if name ==# 'SpaceVim'
       let repo = {
             \ 'name' : 'SpaceVim',
-            \ 'path' : expand('~/.SpaceVim')
+            \ 'path' : g:_spacevim_root_dir
             \ }
     elseif g:spacevim_plugin_manager ==# 'dein'
       let repo = dein#get(name)
@@ -380,7 +380,7 @@ function! s:pull(repo) abort
       if name ==# 'SpaceVim'
         let repo = {
               \ 'name' : 'SpaceVim',
-              \ 'path' : expand('~/.SpaceVim')
+              \ 'path' : g:_spacevim_root_dir
               \ }
       elseif g:spacevim_plugin_manager ==# 'dein'
         let repo = dein#get(name)
@@ -490,7 +490,7 @@ if has('nvim')
     call s:set_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '+ ' . a:name . ': Updating...')
   endfunction
   function! s:msg_on_local(name) abort
-    call s:set_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '- ' . a:name . ': Skip local')
+    call s:set_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '- ' . a:name . ': skip local plugin')
   endfunction
   function! s:msg_on_install_start(name) abort
     call s:set_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '+ ' . a:name . ': Installing...')
@@ -500,7 +500,7 @@ elseif s:VIM_CO.has('python')
     call s:append_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '+ ' . a:name . ': Updating...')
   endfunction
   function! s:msg_on_local(name) abort
-    call s:append_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '- ' . a:name . ': Skip local')
+    call s:append_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '- ' . a:name . ': skip local plugin')
   endfunction
   function! s:msg_on_install_start(name) abort
     call s:append_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '+ ' . a:name . ': Installing...')
@@ -510,7 +510,7 @@ else
     call s:set_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '+ ' . a:name . ': Updating...')
   endfunction
   function! s:msg_on_local(name) abort
-    call s:set_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '- ' . a:name . ': Skip local')
+    call s:set_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '- ' . a:name . ': skip local plugin')
   endfunction
   function! s:msg_on_install_start(name) abort
     call s:set_buf_line(s:plugin_manager_buffer, s:ui_buf[a:name] + 3, '+ ' . a:name . ': Installing...')

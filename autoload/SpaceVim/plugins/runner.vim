@@ -197,7 +197,7 @@ function! s:async_run(runner, ...) abort
         call s:JOB.chanclose(s:runner_jobid, 'stdin')
       endif
     else
-      call s:BUFFER.buf_set_lines(s:code_runner_bufnr, s:runner_lines , -1, 0, [exe . ' is not executable, make sure ' . exe . ' is in your PATH'])
+      call s:BUFFER.buf_set_lines(s:code_runner_bufnr, s:runner_lines , -1, 0, [exe[0] . ' is not executable, make sure ' . exe[0] . ' is in your PATH'])
     endif
   endif
   if s:runner_jobid > 0
@@ -287,14 +287,16 @@ function! s:on_stdout(job_id, data, event) abort
   if bufexists(s:code_runner_bufnr)
     if s:SYS.isWindows
       let data = map(a:data, 'substitute(v:val, "\r$", "", "g")')
+    else
+      let data = a:data
     endif
     call s:BUFFER.buf_set_lines(s:code_runner_bufnr, s:runner_lines , s:runner_lines + 1, 0, data)
+    let s:runner_lines += len(data)
+    if s:winid >= 0
+      call s:VIM.win_set_cursor(s:winid, [s:VIM.buf_line_count(s:code_runner_bufnr), 1])
+    endif
+    call s:update_statusline()
   endif
-  let s:runner_lines += len(a:data)
-  if s:winid >= 0
-    call s:VIM.win_set_cursor(s:winid, [s:VIM.buf_line_count(s:code_runner_bufnr), 1])
-  endif
-  call s:update_statusline()
 endfunction
 
 function! s:on_stderr(job_id, data, event) abort

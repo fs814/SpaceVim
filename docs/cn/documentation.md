@@ -27,12 +27,15 @@ lang: zh
 - [界面元素](#界面元素)
   - [颜色主题](#颜色主题)
   - [字体](#字体)
+- [鼠标](#鼠标)
+  - [滚动条](#滚动条)
   - [界面元素切换](#界面元素切换)
   - [状态栏](#状态栏)
   - [标签栏](#标签栏)
   - [文件树](#文件树)
     - [文件树中的常用操作](#文件树中的常用操作)
     - [文件树中打开文件](#文件树中打开文件)
+    - [修改文件树默认快捷键](#修改文件树默认快捷键)
 - [基本操作](#基本操作)
   - [原生功能](#原生功能)
   - [命令行模式快捷键](#命令行模式快捷键)
@@ -86,6 +89,7 @@ lang: zh
     - [自定义任务](#自定义任务)
     - [任务自动识别](#任务自动识别)
     - [任务提供源](#任务提供源)
+  - [代办事项管理器](#代办事项管理器)
   - [Iedit 多光标编辑](#iedit-多光标编辑)
     - [Iedit 快捷键](#iedit-快捷键)
   - [高亮光标下变量](#高亮光标下变量)
@@ -149,8 +153,6 @@ Neovim 运行在 iTerm2 上，采用 SpaceVim，配色为：_base16-solarized-da
 展示了一个通用的前端开发界面，用于开发：JavaScript (jQuery), SASS, 和 PHP buffers。
 
 图中包含了一个 Neovim 的终端，一个语法树窗口，一个文件树窗口以及一个 TernJS 定义窗口
-
-想要查阅更多截图，请阅读 [issue #415](https://github.com/SpaceVim/SpaceVim/issues/415)
 
 ## 基本概念
 
@@ -534,6 +536,32 @@ SpaceVim 在终端下默认使用了真色，因此使用之前需要确认下�
 
 如果指定的字体不存在，将会使用系统默认的字体，此外，这一选项在终端下是无效的，终端下修改字体，需要修改终端自身配置。
 
+## 鼠标
+
+默认情况下，在 `Normal` 模式和 `Visual` 模式下启用鼠标。
+如果需要修改这个默认值，可以使用启动函数：
+
+例如：禁用鼠标：
+
+```vim
+function! myspacevim#before() abort
+    set mouse=
+endfunction
+```
+
+更多信息可以阅读 `:h 'mouse'`。
+
+
+### 滚动条
+
+窗口右侧的滚动条默认是关闭的，如果需要启动滚动条，需要修改[ui 模块](../layers/ui/)的 `enable_scrollbar` 选项：
+
+```
+[[layers]]
+  name = "ui"
+  enable_scrollbar = true
+```
+
 ### 界面元素切换
 
 所有的界面元素切换快捷键都以 `[SPC] t` 或 `[SPC] T` 开头，你可以在快捷键导航中查阅所有快捷键。
@@ -867,6 +895,24 @@ SpaceVim 的文件树提供了版本控制信息的接口，但是这一特性�
 | `l` / `<Enter>` | 打开文件         |
 | `sg`            | 分屏打开文件     |
 | `sv`            | 垂直分屏打开文件 |
+
+#### 修改文件树默认快捷键
+
+如果想要修改文件树内的默认快捷键，需要再启动函数里面调用用户自定义的自动命令，比如：
+
+```vim
+function! myspacevim#before() abort
+    autocmd User NerdTreeInit
+        \ nnoremap <silent><buffer> <CR> :<C-u>call
+        \ g:NERDTreeKeyMap.Invoke('o')<CR>
+endfunction
+```
+
+以下是不同文件时所对应的自动命令名称：
+
+- nerdtree: `User NerdTreeInit`
+- defx: `User DefxInit`
+- vimfiler: `User VimfilerInit`
 
 ## 基本操作
 
@@ -2168,6 +2214,22 @@ call SpaceVim#plugins#tasks#reg_provider(funcref('s:make_tasks'))
 将以上内容加入启动函数，在 SpceVim 仓库内按下 `SPC p t r` 快捷键，将会展示如下任务：
 
 ![task-make](https://user-images.githubusercontent.com/13142418/75105016-084cac80-564b-11ea-9fe6-75d86a0dbb9b.png)
+
+### 代办事项管理器
+
+待办事项管理插件将异步执行`rg`命令，结果会展示在底部待办事项窗口。
+默认的快捷键是 `SPC a o`，默认的标签前缀是 `@`，
+默认的标签包含：`['fixme', 'question', 'todo', 'idea']`.
+
+配置示例：
+
+```
+[options]
+   todo_labels = ['fixme', 'question', 'todo', 'idea']
+   todo_prefix = '@'
+```
+
+![todo manager](https://user-images.githubusercontent.com/13142418/61462920-0bd9d000-a9a6-11e9-8e1f-c70d6ec6ca1e.png)
 
 ### Iedit 多光标编辑
 

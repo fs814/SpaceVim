@@ -129,7 +129,7 @@ else
     for key in s:sort_by_opened_time()
       let desc = '[' . s:project_paths[key].name . '] ' . s:project_paths[key].path . ' <' . strftime('%Y-%m-%d %T', s:project_paths[key].opened_time) . '>'
       let cmd = "call SpaceVim#plugins#projectmanager#open('" . s:project_paths[key].path . "')"
-      call add(g:unite_source_menu_menus.Projects.command_candidates, [desc,cmd])
+      call add(g:unite_source_menu_menus.Projects.command_candidates, [desc, cmd, s:project_paths[key]])
     endfor
     if g:spacevim_enable_projects_cache
       call s:cache()
@@ -285,6 +285,8 @@ else
       FzfMenu Projects
     elseif SpaceVim#layers#isLoaded('leaderf')
       call SpaceVim#layers#leaderf#run_menu('Projects')
+    elseif SpaceVim#layers#isLoaded('telescope')
+      Telescope project
     else
       call SpaceVim#logger#warn('fuzzy find layer is needed to find project!')
     endif
@@ -353,13 +355,26 @@ else
     let rootdir = getbufvar('%', 'rootDir', '')
     if empty(rootdir)
       let rootdir = s:find_root_directory()
-      if empty(rootdir)
-        let rootdir = s:FILE.unify_path(getcwd())
+      if !empty(rootdir)
+        call setbufvar('%', 'rootDir', rootdir)
       endif
-      call setbufvar('%', 'rootDir', rootdir)
     endif
-    call s:change_dir(rootdir)
-    call SpaceVim#plugins#projectmanager#RootchandgeCallback()
+    if !empty(rootdir)
+      call s:change_dir(rootdir)
+      call SpaceVim#plugins#projectmanager#RootchandgeCallback()
+    else
+      if g:spacevim_project_non_root ==# 'current'
+        let dir = fnamemodify(expand('%'), ':p:h')
+        if isdirectory(dir)
+          call s:change_dir(dir)
+        endif
+      elseif g:spacevim_project_non_root ==# 'home' && filereadable(expand('%')) 
+        let dir = fnamemodify(expand('~'), ':p')
+        if isdirectory(dir)
+          call s:change_dir(dir)
+        endif
+      endif
+    endif
     return rootdir
   endfunction
   function! SpaceVim#plugins#projectmanager#kill_project() abort

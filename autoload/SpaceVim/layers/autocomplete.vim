@@ -102,6 +102,11 @@ function! SpaceVim#layers#autocomplete#plugins() abort
           \ 'merged' : 0,
           \ 'loadconf' : 1,
           \ }])
+    if g:spacevim_snippet_engine ==# 'neosnippet'
+      call add(plugins, [g:_spacevim_root_dir . 'bundle/cmp-neosnippet', {
+            \ 'merged' : 0,
+            \ }])
+    endif
   elseif g:spacevim_autocomplete_method ==# 'asyncomplete'
     call add(plugins, ['prabirshrestha/asyncomplete.vim', {
           \ 'loadconf' : 1,
@@ -216,6 +221,9 @@ function! SpaceVim#layers#autocomplete#config() abort
       call SpaceVim#logger#warn('Can not use same value for escape_key_binding and auto_completion_complete_with_key_sequence')
     endif
   endif
+  let g:_spacevim_mappings_space.x = {'name' : '+Text'}
+  let g:_spacevim_mappings_space.x.s = {'name' : '+String/Snippet'}
+  call SpaceVim#mapping#space#def('nnoremap', ['x', 's', 's'], 'NeoSnippetEdit', 'edit-snippet-file', 1)
 endfunction
 
 function! SpaceVim#layers#autocomplete#set_variable(var) abort
